@@ -214,7 +214,9 @@ fn try_which_command() -> Option<ClaudeInstallation> {
 fn try_which_command() -> Option<ClaudeInstallation> {
     debug!("Trying 'where claude' to find binary...");
 
-    match Command::new("where").arg("claude").output() {
+    let mut where_cmd = Command::new("where");
+    crate::win_nw::nw_std(&mut where_cmd);
+    match where_cmd.arg("claude").output() {
         Ok(output) if output.status.success() => {
             let output_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
 
@@ -412,7 +414,11 @@ fn find_standard_installations() -> Vec<ClaudeInstallation> {
     }
 
     // Also check if claude is available in PATH (without full path)
-    if let Ok(output) = Command::new("claude").arg("--version").output() {
+    if let Ok(output) = {
+        let mut c = Command::new("claude");
+        crate::win_nw::nw_std(&mut c);
+        c.arg("--version").output()
+    } {
         if output.status.success() {
             debug!("claude is available in PATH");
             let version = extract_version_from_output(&output.stdout);
@@ -481,7 +487,9 @@ fn find_standard_installations() -> Vec<ClaudeInstallation> {
     }
 
     // Also check if claude is available in PATH (without full path)
-    if let Ok(output) = Command::new("claude.exe").arg("--version").output() {
+    let mut path_claude_cmd = Command::new("claude.exe");
+    crate::win_nw::nw_std(&mut path_claude_cmd);
+    if let Ok(output) = path_claude_cmd.arg("--version").output() {
         if output.status.success() {
             debug!("claude.exe is available in PATH");
             let version = extract_version_from_output(&output.stdout);
@@ -500,7 +508,9 @@ fn find_standard_installations() -> Vec<ClaudeInstallation> {
 
 /// Get Claude version by running --version command
 fn get_claude_version(path: &str) -> Result<Option<String>, String> {
-    match Command::new(path).arg("--version").output() {
+    let mut ver_cmd = Command::new(path);
+    crate::win_nw::nw_std(&mut ver_cmd);
+    match ver_cmd.arg("--version").output() {
         Ok(output) => {
             if output.status.success() {
                 Ok(extract_version_from_output(&output.stdout))
@@ -620,6 +630,7 @@ fn compare_versions(a: &str, b: &str) -> Ordering {
 /// This ensures commands like Claude can find Node.js and other dependencies
 pub fn create_command_with_env(program: &str) -> Command {
     let mut cmd = Command::new(program);
+    crate::win_nw::nw_std(&mut cmd);
 
     info!("Creating command for: {}", program);
 

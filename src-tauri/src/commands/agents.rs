@@ -1295,7 +1295,9 @@ pub async fn cleanup_finished_processes(db: State<'_, AgentDb>) -> Result<Vec<i6
         // Check if the process is still running
         let is_running = if cfg!(target_os = "windows") {
             // On Windows, use tasklist to check if process exists
-            match std::process::Command::new("tasklist")
+            let mut tl = std::process::Command::new("tasklist");
+            crate::win_nw::nw_std(&mut tl);
+            match tl
                 .args(["/FI", &format!("PID eq {}", pid)])
                 .args(["/FO", "CSV"])
                 .output()
@@ -1649,6 +1651,7 @@ fn create_command_with_env(program: &str) -> Command {
 
     // Create a new tokio Command from the program path
     let mut tokio_cmd = Command::new(program);
+    crate::win_nw::nw_tokio(&mut tokio_cmd);
 
     // Copy over all environment variables from the std::process::Command
     // This is a workaround since we can't directly convert between the two types

@@ -5,6 +5,7 @@ mod checkpoint;
 mod claude_binary;
 mod commands;
 mod process;
+mod win_nw;
 
 use checkpoint::state::CheckpointState;
 use commands::agents::{
@@ -52,8 +53,25 @@ use tauri::Manager;
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
 
 fn main() {
-    // Initialize logger
-    env_logger::init();
+    // Initialize logger — GUI app has no console, pipe logs to a file
+    let log_dir = std::env::var("LOCALAPPDATA")
+        .map(|d| std::path::Path::new(&d).join("opcode"))
+        .unwrap_or_else(|_| std::path::PathBuf::from("."));
+    let _ = std::fs::create_dir_all(&log_dir);
+    let log_file = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(log_dir.join("opcode.log"))
+        .ok();
+    if let Some(file) = log_file {
+        env_logger::Builder::new()
+            .filter_level(log::LevelFilter::Debug)
+            .format_timestamp_secs()
+            .target(env_logger::Target::Pipe(Box::new(file)))
+            .init();
+    } else {
+        env_logger::init();
+    }
 
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())

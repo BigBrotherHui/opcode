@@ -5,6 +5,7 @@ mod claude_binary;
 mod commands;
 mod process;
 mod web_server;
+mod win_nw;
 
 #[derive(Parser)]
 #[command(name = "opcode-web")]
