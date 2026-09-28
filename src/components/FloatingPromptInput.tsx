@@ -25,17 +25,16 @@ import { ImagePreview } from "./ImagePreview";
 import { type FileEntry, type SlashCommand } from "@/lib/api";
 
 // Conditional import for Tauri webview window
-let tauriGetCurrentWebviewWindow: any;
-try {
-  if (typeof window !== 'undefined' && window.__TAURI__) {
-    tauriGetCurrentWebviewWindow = require("@tauri-apps/api/webviewWindow").getCurrentWebviewWindow;
-  }
-} catch (e) {
-  console.log('[FloatingPromptInput] Tauri webview API not available, using web mode');
-}
+import { getCurrentWebviewWindow as tauriGetCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
+
+// Tauri v2 exposes __TAURI_INTERNALS__ (window.__TAURI__ no longer exists)
+const isTauriEnv = typeof window !== 'undefined' && !!(window as any).__TAURI_INTERNALS__;
 
 // Web-compatible replacement
-const getCurrentWebviewWindow = tauriGetCurrentWebviewWindow || (() => ({ listen: () => Promise.resolve(() => {}) }));
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getCurrentWebviewWindow: any = isTauriEnv
+  ? tauriGetCurrentWebviewWindow
+  : (() => ({ listen: () => Promise.resolve(() => {}) }));
 
 interface FloatingPromptInputProps {
   /**

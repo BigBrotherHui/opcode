@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
+import { listen as tauriListen } from "@tauri-apps/api/event";
+import {
   Copy,
   ChevronDown,
   GitBranch,
@@ -16,23 +17,15 @@ import { Popover } from "@/components/ui/popover";
 import { api, type Session } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
-// Conditional imports for Tauri APIs
-let tauriListen: any;
+// Tauri v2 exposes __TAURI_INTERNALS__ (window.__TAURI__ no longer exists)
+const isTauriEnv = typeof window !== 'undefined' && !!(window as any).__TAURI_INTERNALS__;
+
 type UnlistenFn = () => void;
 
-try {
-  if (typeof window !== 'undefined' && window.__TAURI__) {
-    tauriListen = require("@tauri-apps/api/event").listen;
-  }
-} catch (e) {
-  console.log('[ClaudeCodeSession] Tauri APIs not available, using web mode');
-}
-
-// Web-compatible replacements
-const listen = tauriListen || ((eventName: string, callback: (event: any) => void) => {
+// Web-compatible replacements (web mode receives backend events as DOM CustomEvents)
+const listen = isTauriEnv ? tauriListen : ((eventName: string, callback: (event: any) => void) => {
   console.log('[ClaudeCodeSession] Setting up DOM event listener for:', eventName);
 
-  // In web mode, listen for DOM events
   const domEventHandler = (event: any) => {
     console.log('[ClaudeCodeSession] DOM event received:', eventName, event.detail);
     // Simulate Tauri event structure
