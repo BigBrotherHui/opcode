@@ -101,7 +101,7 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
       const projectPath = await open({
         directory: true,
         multiple: false,
-        title: `Select project directory for ${agent.name}`
+        title: `为 ${agent.name} 选择项目目录`
       });
       
       if (!projectPath) {
@@ -121,7 +121,7 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
       }));
     } catch (error) {
       console.error('Failed to run agent:', error);
-      setToast({ message: `Failed to run agent: ${agent.name}`, type: 'error' });
+      setToast({ message: `运行智能体失败：${agent.name}`, type: 'error' });
     }
   };
 
@@ -167,11 +167,11 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
       if (filePath) {
         const agent = await api.importAgentFromFile(filePath as string);
         loadAgents(); // Refresh list
-        setToast({ message: `Agent "${agent.name}" imported successfully`, type: "success" });
+        setToast({ message: `智能体 "${agent.name}" 已导入`, type: "success" });
       }
     } catch (error) {
       console.error('Failed to import agent:', error);
-      setToast({ message: "Failed to import agent", type: "error" });
+      setToast({ message: "导入智能体失败", type: "error" });
     }
   };
 
@@ -192,11 +192,11 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
       
       if (filePath) {
         await invoke('write_file', { path: filePath, content: JSON.stringify(exportData, null, 2) });
-        setToast({ message: "Agent exported successfully", type: "success" });
+        setToast({ message: "智能体已导出", type: "success" });
       }
     } catch (error) {
       console.error('Failed to export agent:', error);
-      setToast({ message: "Failed to export agent", type: "error" });
+      setToast({ message: "导出智能体失败", type: "error" });
     }
   };
 
@@ -220,18 +220,18 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
         <DialogHeader className="px-6 pt-6">
           <DialogTitle className="flex items-center gap-2">
             <Bot className="w-5 h-5" />
-            Agent Management
+            智能体管理
           </DialogTitle>
           <DialogDescription>
-            Create new agents or manage running agent executions
+            创建新智能体或管理运行中的智能体
           </DialogDescription>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
           <TabsList className="mx-6">
-            <TabsTrigger value="agents">Available Agents</TabsTrigger>
+            <TabsTrigger value="agents">可用智能体</TabsTrigger>
             <TabsTrigger value="running" className="relative">
-              Running Agents
+              运行中的智能体
               {runningAgents.length > 0 && (
                 <Badge variant="secondary" className="ml-2 h-5 px-1.5">
                   {runningAgents.length}
@@ -247,24 +247,24 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
                 <div className="flex gap-2 mb-4 pt-4">
                   <Button onClick={handleCreateAgent} className="flex-1">
                     <Plus className="w-4 h-4 mr-2" />
-                    Create Agent
+                    创建智能体
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" className="flex-1">
                         <Import className="w-4 h-4 mr-2" />
-                        Import Agent
+                        导入智能体
                         <ChevronDown className="w-4 h-4 ml-2" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                       <DropdownMenuItem onClick={handleImportFromFile}>
                         <FileJson className="w-4 h-4 mr-2" />
-                        From File
+                        从文件导入
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={handleImportFromGitHub}>
                         <Globe className="w-4 h-4 mr-2" />
-                        From GitHub
+                        从 GitHub 导入
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -276,16 +276,16 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
                 ) : agents.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center">
                     <Bot className="w-12 h-12 text-muted-foreground mb-4" />
-                    <p className="text-lg font-medium mb-2">No agents available</p>
+                    <p className="text-lg font-medium mb-2">暂无可用智能体</p>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Create your first agent to get started
+                      创建你的第一个智能体，开始使用
                     </p>
                     <Button onClick={() => {
                       onOpenChange(false);
                       window.dispatchEvent(new CustomEvent('open-create-agent-tab'));
                     }}>
                       <Plus className="w-4 h-4 mr-2" />
-                      Create Agent
+                      创建智能体
                     </Button>
                   </div>
                 ) : (
@@ -316,7 +316,7 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
                               onClick={() => handleExportAgent(agent)}
                             >
                               <Download className="w-3 h-3 mr-1" />
-                              Export
+                              导出
                             </Button>
                             <Button
                               size="sm"
@@ -325,14 +325,14 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
                               className="text-destructive hover:text-destructive"
                             >
                               <Trash2 className="w-3 h-3 mr-1" />
-                              Delete
+                              删除
                             </Button>
                             <Button
                               size="sm"
                               onClick={() => handleRunAgent(agent)}
                             >
                               <Play className="w-3 h-3 mr-1" />
-                              Run
+                              运行
                             </Button>
                           </div>
                         </div>
@@ -348,9 +348,9 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
                 {runningAgents.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center">
                     <Clock className="w-12 h-12 text-muted-foreground mb-4" />
-                    <p className="text-lg font-medium mb-2">No running agents</p>
+                    <p className="text-lg font-medium mb-2">暂无运行中的智能体</p>
                     <p className="text-sm text-muted-foreground">
-                      Agent executions will appear here when started
+                      智能体启动后，执行记录将显示在此处
                     </p>
                   </div>
                 ) : (
@@ -376,7 +376,7 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
                                 {run.task}
                               </p>
                               <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                                <span>Started: {formatISOTimestamp(run.created_at)}</span>
+                                <span>开始时间：{formatISOTimestamp(run.created_at)}</span>
                                 <Badge variant="outline" className="text-xs">
                                   {run.model === 'opus' ? 'Claude 4 Opus' : 'Claude 4 Sonnet'}
                                 </Badge>
@@ -390,7 +390,7 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
                                 handleOpenAgentRun(run);
                               }}
                             >
-                              View
+                              查看
                             </Button>
                           </div>
                         </motion.div>
@@ -409,9 +409,9 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
     <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Agent</DialogTitle>
+          <DialogTitle>删除智能体</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete "{agentToDelete?.name}"? This action cannot be undone.
+            确定要删除"{agentToDelete?.name}"吗？此操作无法撤销。
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-end gap-3 mt-4">
@@ -422,13 +422,13 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
               setAgentToDelete(null);
             }}
           >
-            Cancel
+            取消
           </Button>
           <Button
             variant="destructive"
             onClick={confirmDelete}
           >
-            Delete
+            删除
           </Button>
         </div>
       </DialogContent>
@@ -441,7 +441,7 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
       onImportSuccess={() => {
         setShowGitHubBrowser(false);
         loadAgents(); // Refresh the agents list
-        setToast({ message: "Agent imported successfully", type: "success" });
+        setToast({ message: "智能体已导入", type: "success" });
       }}
     />
 

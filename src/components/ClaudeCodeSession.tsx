@@ -388,7 +388,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
       }, 100);
     } catch (err) {
       console.error("Failed to load session history:", err);
-      setError("Failed to load session history");
+      setError("加载会话历史失败");
     } finally {
       setIsLoading(false);
     }
@@ -491,7 +491,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
     console.log('[ClaudeCodeSession] handleSendPrompt called with:', { prompt, model, projectPath, claudeSessionId, effectiveSession });
     
     if (!projectPath) {
-      setError("Please select a project directory first");
+      setError("请先选择一个项目目录");
       return;
     }
 
@@ -884,7 +884,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
       }
     } catch (err) {
       console.error("Failed to send prompt:", err);
-      setError("Failed to send prompt");
+      setError("发送提示词失败");
       setIsLoading(false);
       hasActiveSessionRef.current = false;
     }
@@ -1061,7 +1061,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
       const cancelMessage: ClaudeStreamMessage = {
         type: "system",
         subtype: "info",
-        result: "Session cancelled by user",
+        result: "会话已被用户取消",
         timestamp: new Date().toISOString()
       };
       setMessages(prev => [...prev, cancelMessage]);
@@ -1073,7 +1073,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
       const errorMessage: ClaudeStreamMessage = {
         type: "system",
         subtype: "error",
-        result: `Failed to cancel execution: ${err instanceof Error ? err.message : 'Unknown error'}. The process may still be running in the background.`,
+        result: `取消执行失败：${err instanceof Error ? err.message : '未知错误'}。进程可能仍在后台运行。`,
         timestamp: new Date().toISOString()
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -1358,7 +1358,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
                   <div className="flex items-center gap-3">
                     <div className="rotating-symbol text-primary" />
                     <span className="text-sm text-muted-foreground">
-                      {session ? "Loading session history..." : "Initializing Claude Code..."}
+                      {session ? "加载会话历史中…" : "正在初始化 Claude Code…"}
                     </span>
                   </div>
                 </div>
@@ -1381,9 +1381,9 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
                 <div className="bg-background/95 backdrop-blur-md border rounded-lg shadow-lg p-3 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="text-xs font-medium text-muted-foreground mb-1">
-                      Queued Prompts ({queuedPrompts.length})
+                      队列中的提示（{queuedPrompts.length}）
                     </div>
-                    <TooltipSimple content={queuedPromptsCollapsed ? "Expand queue" : "Collapse queue"} side="top">
+                    <TooltipSimple content={queuedPromptsCollapsed ? "展开队列" : "收起队列"} side="top">
                       <motion.div
                         whileTap={{ scale: 0.97 }}
                         transition={{ duration: 0.15 }}
@@ -1442,7 +1442,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
               className="fixed bottom-32 right-6 z-50"
             >
               <div className="flex items-center bg-background/95 backdrop-blur-md border rounded-full shadow-lg overflow-hidden">
-                <TooltipSimple content="Scroll to top" side="top">
+                <TooltipSimple content="滚动到顶部" side="top">
                   <motion.div
                     whileTap={{ scale: 0.97 }}
                     transition={{ duration: 0.15 }}
@@ -1480,7 +1480,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
                   </motion.div>
                 </TooltipSimple>
                 <div className="w-px h-4 bg-border" />
-                <TooltipSimple content="Scroll to bottom" side="top">
+                <TooltipSimple content="滚动到底部" side="top">
                   <motion.div
                     whileTap={{ scale: 0.97 }}
                     transition={{ duration: 0.15 }}
@@ -1530,7 +1530,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
               extraMenuItems={
                 <>
                   {effectiveSession && (
-                    <TooltipSimple content="Session Timeline" side="top">
+                    <TooltipSimple content="会话时间线" side="top">
                       <motion.div
                         whileTap={{ scale: 0.97 }}
                         transition={{ duration: 0.15 }}
@@ -1549,7 +1549,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
                   {messages.length > 0 && (
                     <Popover
                       trigger={
-                        <TooltipSimple content="Copy conversation" side="top">
+                        <TooltipSimple content="复制对话" side="top">
                           <motion.div
                             whileTap={{ scale: 0.97 }}
                             transition={{ duration: 0.15 }}
@@ -1572,7 +1572,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
                             onClick={handleCopyAsMarkdown}
                             className="w-full justify-start text-xs"
                           >
-                            Copy as Markdown
+                            复制为 Markdown
                           </Button>
                           <Button
                             variant="ghost"
@@ -1580,7 +1580,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
                             onClick={handleCopyAsJsonl}
                             className="w-full justify-start text-xs"
                           >
-                            Copy as JSONL
+                            复制为 JSONL
                           </Button>
                         </div>
                       }
@@ -1590,7 +1590,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
                       align="end"
                     />
                   )}
-                  <TooltipSimple content="Checkpoint Settings" side="top">
+                  <TooltipSimple content="检查点设置" side="top">
                     <motion.div
                       whileTap={{ scale: 0.97 }}
                       transition={{ duration: 0.15 }}
@@ -1624,7 +1624,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
                     <div className="flex items-center gap-1.5 text-xs">
                       <Hash className="h-3 w-3 text-muted-foreground" />
                       <span className="font-mono">{totalTokens.toLocaleString()}</span>
-                      <span className="text-muted-foreground">tokens</span>
+                      <span className="text-muted-foreground">Token</span>
                     </div>
                   </motion.div>
                 </div>
@@ -1646,7 +1646,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
               <div className="h-full flex flex-col">
                 {/* Timeline Header */}
                 <div className="flex items-center justify-between p-4 border-b border-border">
-                  <h3 className="text-lg font-semibold">Session Timeline</h3>
+                  <h3 className="text-lg font-semibold">会话时间线</h3>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -1680,18 +1680,18 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
       <Dialog open={showForkDialog} onOpenChange={setShowForkDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Fork Session</DialogTitle>
+            <DialogTitle>分叉会话</DialogTitle>
             <DialogDescription>
-              Create a new session branch from the selected checkpoint.
+              从所选检查点创建新的会话分支。
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="fork-name">New Session Name</Label>
+              <Label htmlFor="fork-name">新会话名称</Label>
               <Input
                 id="fork-name"
-                placeholder="e.g., Alternative approach"
+                placeholder="例如：另一种实现方案"
                 value={forkSessionName}
                 onChange={(e) => setForkSessionName(e.target.value)}
                 onKeyDown={(e) => {
@@ -1714,13 +1714,13 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
               onClick={() => setShowForkDialog(false)}
               disabled={isLoading}
             >
-              Cancel
+              取消
             </Button>
             <Button
               onClick={handleConfirmFork}
               disabled={isLoading || !forkSessionName.trim()}
             >
-              Create Fork
+              创建分叉
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1745,9 +1745,9 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
         <Dialog open={showSlashCommandsSettings} onOpenChange={setShowSlashCommandsSettings}>
           <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
             <DialogHeader>
-              <DialogTitle>Slash Commands</DialogTitle>
+              <DialogTitle>斜杠命令</DialogTitle>
               <DialogDescription>
-                Manage project-specific slash commands for {projectPath}
+                管理 {projectPath} 的项目专属斜杠命令
               </DialogDescription>
             </DialogHeader>
             <div className="flex-1 overflow-y-auto">

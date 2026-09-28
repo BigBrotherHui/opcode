@@ -101,12 +101,12 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
    */
   const handleAddStdioServer = async () => {
     if (!stdioName.trim()) {
-      onError("Server name is required");
+      onError("服务器名称不能为空");
       return;
     }
     
     if (!stdioCommand.trim()) {
-      onError("Command is required");
+      onError("命令不能为空");
       return;
     }
     
@@ -152,7 +152,7 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
         onError(result.message);
       }
     } catch (error) {
-      onError("Failed to add server");
+      onError("添加服务器失败");
       console.error("Failed to add stdio server:", error);
     } finally {
       setSaving(false);
@@ -164,12 +164,12 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
    */
   const handleAddSseServer = async () => {
     if (!sseName.trim()) {
-      onError("Server name is required");
+      onError("服务器名称不能为空");
       return;
     }
     
     if (!sseUrl.trim()) {
-      onError("URL is required");
+      onError("URL 不能为空");
       return;
     }
     
@@ -211,7 +211,7 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
         onError(result.message);
       }
     } catch (error) {
-      onError("Failed to add server");
+      onError("添加服务器失败");
       console.error("Failed to add SSE server:", error);
     } finally {
       setSaving(false);
@@ -225,7 +225,7 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
     return (
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="text-sm font-medium">Environment Variables</Label>
+          <Label className="text-sm font-medium">环境变量</Label>
           <Button
             variant="outline"
             size="sm"
@@ -233,7 +233,7 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
             className="gap-2"
           >
             <Plus className="h-3 w-3" />
-            Add Variable
+            添加变量
           </Button>
         </div>
         
@@ -242,14 +242,14 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
             {envVars.map((envVar) => (
               <div key={envVar.id} className="flex items-center gap-2">
                 <Input
-                  placeholder="KEY"
+                  placeholder="键名"
                   value={envVar.key}
                   onChange={(e) => updateEnvVar(type, envVar.id, "key", e.target.value)}
                   className="flex-1 font-mono text-sm"
                 />
                 <span className="text-muted-foreground">=</span>
                 <Input
-                  placeholder="value"
+                  placeholder="值"
                   value={envVar.value}
                   onChange={(e) => updateEnvVar(type, envVar.id, "value", e.target.value)}
                   className="flex-1 font-mono text-sm"
@@ -273,9 +273,9 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h3 className="text-base font-semibold">Add MCP Server</h3>
+        <h3 className="text-base font-semibold">添加 MCP 服务器</h3>
         <p className="text-sm text-muted-foreground mt-1">
-          Configure a new Model Context Protocol server
+          配置新的 Model Context Protocol 服务器
         </p>
       </div>
 
@@ -296,7 +296,7 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
           <Card className="p-6 space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="stdio-name">Server Name</Label>
+                <Label htmlFor="stdio-name">服务器名称</Label>
                 <Input
                   id="stdio-name"
                   placeholder="my-server"
@@ -304,12 +304,12 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
                   onChange={(e) => setStdioName(e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  A unique name to identify this server
+                  用于标识此服务器的唯一名称
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="stdio-command">Command</Label>
+                <Label htmlFor="stdio-command">命令</Label>
                 <Input
                   id="stdio-command"
                   placeholder="/path/to/server"
@@ -318,12 +318,12 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
                   className="font-mono"
                 />
                 <p className="text-xs text-muted-foreground">
-                  The command to execute the server
+                  用于启动服务器的命令
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="stdio-args">Arguments (optional)</Label>
+                <Label htmlFor="stdio-args">参数（可选）</Label>
                 <Input
                   id="stdio-args"
                   placeholder="arg1 arg2 arg3"
@@ -332,19 +332,19 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
                   className="font-mono"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Space-separated command arguments
+                  以空格分隔的命令参数
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="stdio-scope">Scope</Label>
+                <Label htmlFor="stdio-scope">作用域</Label>
                 <SelectComponent
                   value={stdioScope}
                   onValueChange={(value: string) => setStdioScope(value)}
                   options={[
-                    { value: "local", label: "Local (this project only)" },
-                    { value: "project", label: "Project (shared via .mcp.json)" },
-                    { value: "user", label: "User (all projects)" },
+                    { value: "local", label: "本地（仅当前项目）" },
+                    { value: "project", label: "项目（通过 .mcp.json 共享）" },
+                    { value: "user", label: "用户（所有项目）" },
                   ]}
                 />
               </div>
@@ -361,12 +361,12 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
                 {saving ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Adding Server...
+                    正在添加服务器…
                   </>
                 ) : (
                   <>
                     <Plus className="h-4 w-4" />
-                    Add Stdio Server
+                    添加 Stdio 服务器
                   </>
                 )}
               </Button>
@@ -379,7 +379,7 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
           <Card className="p-6 space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="sse-name">Server Name</Label>
+                <Label htmlFor="sse-name">服务器名称</Label>
                 <Input
                   id="sse-name"
                   placeholder="sse-server"
@@ -387,7 +387,7 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
                   onChange={(e) => setSseName(e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  A unique name to identify this server
+                  用于标识此服务器的唯一名称
                 </p>
               </div>
 
@@ -401,19 +401,19 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
                   className="font-mono"
                 />
                 <p className="text-xs text-muted-foreground">
-                  The SSE endpoint URL
+                  SSE 端点 URL
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="sse-scope">Scope</Label>
+                <Label htmlFor="sse-scope">作用域</Label>
                 <SelectComponent
                   value={sseScope}
                   onValueChange={(value: string) => setSseScope(value)}
                   options={[
-                    { value: "local", label: "Local (this project only)" },
-                    { value: "project", label: "Project (shared via .mcp.json)" },
-                    { value: "user", label: "User (all projects)" },
+                    { value: "local", label: "本地（仅当前项目）" },
+                    { value: "project", label: "项目（通过 .mcp.json 共享）" },
+                    { value: "user", label: "用户（所有项目）" },
                   ]}
                 />
               </div>
@@ -430,12 +430,12 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
                 {saving ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Adding Server...
+                    正在添加服务器…
                   </>
                 ) : (
                   <>
                     <Plus className="h-4 w-4" />
-                    Add SSE Server
+                    添加 SSE 服务器
                   </>
                 )}
               </Button>
@@ -449,7 +449,7 @@ export const MCPAddServer: React.FC<MCPAddServerProps> = ({
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-sm font-medium">
             <Info className="h-4 w-4 text-primary" />
-            <span>Example Commands</span>
+            <span>示例命令</span>
           </div>
           <div className="space-y-2 text-xs text-muted-foreground">
             <div className="font-mono bg-background p-2 rounded">

@@ -122,7 +122,7 @@ export const SessionList: React.FC<SessionListProps> = ({
                         <Clock className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                         <div className="flex-1 min-w-0">
                           <p className="text-body-small font-medium">
-                            Session on {session.message_timestamp 
+                            会话日期：{session.message_timestamp 
                               ? new Date(session.message_timestamp).toLocaleDateString('en-US', { 
                                   month: 'short', 
                                   day: 'numeric',
@@ -139,7 +139,7 @@ export const SessionList: React.FC<SessionListProps> = ({
                       </div>
                       {session.todo_data && (
                         <span className="inline-flex items-center px-1.5 py-0.5 rounded text-caption font-medium bg-primary/10 text-primary">
-                          Todo
+                          待办
                         </span>
                       )}
                     </div>
@@ -151,7 +151,7 @@ export const SessionList: React.FC<SessionListProps> = ({
                       </p>
                     ) : (
                       <p className="text-caption text-muted-foreground/60 italic mb-2">
-                        No messages yet
+                        暂无消息
                       </p>
                     )}
                   </div>

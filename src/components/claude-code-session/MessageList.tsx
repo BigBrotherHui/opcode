@@ -78,11 +78,11 @@ export const MessageList: React.FC<MessageListProps> = React.memo(({
             <Terminal className="h-8 w-8 text-primary" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold mb-2">Ready to start coding</h3>
+            <h3 className="text-lg font-semibold mb-2">准备开始编码</h3>
             <p className="text-sm text-muted-foreground">
               {projectPath 
-                ? "Enter a prompt below to begin your Claude Code session"
-                : "Select a project folder to begin"}
+                ? "在下方输入提示词，开始你的 Claude Code 会话"
+                : "选择一个项目文件夹以开始"}
             </p>
           </div>
         </motion.div>
@@ -146,7 +146,7 @@ export const MessageList: React.FC<MessageListProps> = React.memo(({
         >
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <div className="h-2 w-2 bg-primary rounded-full animate-pulse" />
-            <span>Claude is thinking...</span>
+            <span>Claude 正在思考…</span>
           </div>
         </motion.div>
       )}

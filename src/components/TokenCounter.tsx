@@ -47,7 +47,7 @@ export const TokenCounter: React.FC<TokenCounterProps> = ({
       <div className="flex items-center gap-1.5 text-xs">
         <Hash className="h-3 w-3 text-muted-foreground" />
         <span className="font-mono">{tokens.toLocaleString()}</span>
-        <span className="text-muted-foreground">tokens</span>
+        <span className="text-muted-foreground">Token</span>
       </div>
     </motion.div>
   );

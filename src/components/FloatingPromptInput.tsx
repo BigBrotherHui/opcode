@@ -98,8 +98,8 @@ type ThinkingModeConfig = {
 const THINKING_MODES: ThinkingModeConfig[] = [
   {
     id: "auto",
-    name: "Auto",
-    description: "Let Claude decide",
+    name: "自动",
+    description: "由 Claude 自行决定",
     level: 0,
     icon: <Sparkles className="h-3.5 w-3.5" />,
     color: "text-muted-foreground",
@@ -107,8 +107,8 @@ const THINKING_MODES: ThinkingModeConfig[] = [
   },
   {
     id: "think",
-    name: "Think",
-    description: "Basic reasoning",
+    name: "思考",
+    description: "基础推理",
     level: 1,
     phrase: "think",
     icon: <Lightbulb className="h-3.5 w-3.5" />,
@@ -117,8 +117,8 @@ const THINKING_MODES: ThinkingModeConfig[] = [
   },
   {
     id: "think_hard",
-    name: "Think Hard",
-    description: "Deeper analysis",
+    name: "深入思考",
+    description: "更深入的分析",
     level: 2,
     phrase: "think hard",
     icon: <Brain className="h-3.5 w-3.5" />,
@@ -127,8 +127,8 @@ const THINKING_MODES: ThinkingModeConfig[] = [
   },
   {
     id: "think_harder",
-    name: "Think Harder",
-    description: "Extensive reasoning",
+    name: "加强思考",
+    description: "大量推理",
     level: 3,
     phrase: "think harder",
     icon: <Cpu className="h-3.5 w-3.5" />,
@@ -137,8 +137,8 @@ const THINKING_MODES: ThinkingModeConfig[] = [
   },
   {
     id: "ultrathink",
-    name: "Ultrathink",
-    description: "Maximum computation",
+    name: "超级思考",
+    description: "最大算力",
     level: 4,
     phrase: "ultrathink",
     icon: <Rocket className="h-3.5 w-3.5" />,
@@ -185,7 +185,7 @@ const MODELS: Model[] = [
   {
     id: "sonnet",
     name: "Claude 4 Sonnet",
-    description: "Faster, efficient for most tasks",
+    description: "更快，适合大多数任务的高效选择",
     icon: <Zap className="h-3.5 w-3.5" />,
     shortName: "S",
     color: "text-primary"
@@ -193,7 +193,7 @@ const MODELS: Model[] = [
   {
     id: "opus",
     name: "Claude 4 Opus",
-    description: "More capable, better for complex tasks",
+    description: "能力更强，更适合复杂任务",
     icon: <Zap className="h-3.5 w-3.5" />,
     shortName: "O",
     color: "text-primary"
@@ -868,8 +868,8 @@ const FloatingPromptInputInner = (
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">Compose your prompt</h3>
-                <TooltipSimple content="Minimize" side="bottom">
+                <h3 className="text-sm font-medium">编写提示词</h3>
+                <TooltipSimple content="最小化" side="bottom">
                   <motion.div
                     whileTap={{ scale: 0.97 }}
                     transition={{ duration: 0.15 }}
@@ -902,7 +902,7 @@ const FloatingPromptInputInner = (
                 onCompositionStart={handleCompositionStart}
                 onCompositionEnd={handleCompositionEnd}
                 onPaste={handlePaste}
-                placeholder="Type your message..."
+                placeholder="输入你的消息…"
                 className="min-h-[200px] resize-none"
                 disabled={disabled}
                 onDragEnter={handleDrag}
@@ -914,7 +914,7 @@ const FloatingPromptInputInner = (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">Model:</span>
+                    <span className="text-xs text-muted-foreground">模型：</span>
                     <Popover
                       trigger={
                         <Button
@@ -967,7 +967,7 @@ const FloatingPromptInputInner = (
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">Thinking:</span>
+                    <span className="text-xs text-muted-foreground">思考：</span>
                     <Popover
                       trigger={
                         <Tooltip>
@@ -987,7 +987,7 @@ const FloatingPromptInputInner = (
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p className="font-medium">{THINKING_MODES.find(m => m.id === selectedThinkingMode)?.name || "Auto"}</p>
+                              <p className="font-medium">{THINKING_MODES.find(m => m.id === selectedThinkingMode)?.name || "自动"}</p>
                               <p className="text-xs text-muted-foreground">{THINKING_MODES.find(m => m.id === selectedThinkingMode)?.description}</p>
                             </TooltipContent>
                           </Tooltip>
@@ -1031,7 +1031,7 @@ const FloatingPromptInputInner = (
                   </div>
                 </div>
 
-                <TooltipSimple content="Send message" side="top">
+                <TooltipSimple content="发送消息" side="top">
                   <motion.div
                     whileTap={{ scale: 0.97 }}
                     transition={{ duration: 0.15 }}
@@ -1173,7 +1173,7 @@ const FloatingPromptInputInner = (
                           </motion.div>
                         </TooltipTrigger>
                         <TooltipContent side="top">
-                          <p className="text-xs font-medium">Thinking: {THINKING_MODES.find(m => m.id === selectedThinkingMode)?.name || "Auto"}</p>
+                          <p className="text-xs font-medium">思考：{THINKING_MODES.find(m => m.id === selectedThinkingMode)?.name || "自动"}</p>
                           <p className="text-xs text-muted-foreground">{THINKING_MODES.find(m => m.id === selectedThinkingMode)?.description}</p>
                         </TooltipContent>
                       </Tooltip>
@@ -1229,8 +1229,8 @@ const FloatingPromptInputInner = (
                   onPaste={handlePaste}
                   placeholder={
                     dragActive
-                      ? "Drop images here..."
-                      : "Message Claude (@ for files, / for commands)..."
+                      ? "拖放图片到此处…"
+                      : "给 Claude 发消息（@ 引用文件，/ 输入命令）…"
                   }
                   disabled={disabled}
                   className={cn(
@@ -1246,7 +1246,7 @@ const FloatingPromptInputInner = (
 
                 {/* Action buttons inside input - fixed at bottom right */}
                 <div className="absolute right-1.5 bottom-1.5 flex items-center gap-0.5">
-                  <TooltipSimple content="Expand (Ctrl+Shift+E)" side="top">
+                  <TooltipSimple content="展开（Ctrl+Shift+E）" side="top">
                     <motion.div
                       whileTap={{ scale: 0.97 }}
                       transition={{ duration: 0.15 }}
@@ -1263,7 +1263,7 @@ const FloatingPromptInputInner = (
                     </motion.div>
                   </TooltipSimple>
 
-                  <TooltipSimple content={isLoading ? "Stop generation" : "Send message (Enter)"} side="top">
+                  <TooltipSimple content={isLoading ? "停止生成" : "发送消息（Enter）"} side="top">
                     <motion.div
                       whileTap={{ scale: 0.97 }}
                       transition={{ duration: 0.15 }}

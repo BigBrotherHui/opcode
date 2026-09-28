@@ -102,7 +102,7 @@ const TabItem: React.FC<TabItemProps> = ({ tab, isActive, onClose, onClick, isDr
         {tab.hasUnsavedChanges && !statusIcon && (
           <span 
             className="w-1.5 h-1.5 bg-primary rounded-full"
-            title="Unsaved changes"
+            title="未保存的更改"
           />
         )}
       </div>
@@ -119,7 +119,7 @@ const TabItem: React.FC<TabItemProps> = ({ tab, isActive, onClose, onClick, isDr
           "focus:outline-none focus:ring-1 focus:ring-destructive/50",
           (isHovered || isActive) ? "opacity-100" : "opacity-0"
         )}
-        title={`Close ${tab.title}`}
+        title={`关闭 ${tab.title}`}
         tabIndex={-1}
       >
         <X className="w-3 h-3" />
@@ -320,7 +320,7 @@ export const TabManager: React.FC<TabManagerProps> = ({ className }) => {
               "transition-colors duration-200 flex items-center justify-center",
               "bg-background/80 backdrop-blur-sm shadow-sm border border-border/50"
             )}
-            title="Scroll tabs left"
+            title="向左滚动标签"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M15 18l-6-6 6-6" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
@@ -369,7 +369,7 @@ export const TabManager: React.FC<TabManagerProps> = ({ className }) => {
                 ? "hover:bg-muted/60 text-muted-foreground hover:text-foreground"
                 : "opacity-50 cursor-not-allowed text-muted-foreground"
             )}
-            title={canAddTab() ? "New project (Ctrl+T)" : "Maximum tabs reached"}
+            title={canAddTab() ? "新建项目 (Ctrl+T)" : "已达到标签页数量上限"}
           >
             <Plus className="w-4 h-4" />
           </motion.button>
@@ -394,7 +394,7 @@ export const TabManager: React.FC<TabManagerProps> = ({ className }) => {
               "transition-colors duration-200 flex items-center justify-center",
               "bg-background/80 backdrop-blur-sm shadow-sm border border-border/50"
             )}
-            title="Scroll tabs right"
+            title="向右滚动标签"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M9 18l6-6-6-6" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />

@@ -221,7 +221,7 @@ export const SlashCommandPicker: React.FC<SlashCommandPickerProps> = ({
       setCommands(loadedCommands);
     } catch (err) {
       console.error("Failed to load slash commands:", err);
-      setError(err instanceof Error ? err.message : 'Failed to load commands');
+      setError(err instanceof Error ? err.message : '加载命令失败');
       setCommands([]);
     } finally {
       setIsLoading(false);
@@ -278,10 +278,10 @@ export const SlashCommandPicker: React.FC<SlashCommandPickerProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Command className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Slash Commands</span>
+            <span className="text-sm font-medium">斜杠命令</span>
             {searchQuery && (
               <span className="text-xs text-muted-foreground">
-                Searching: "{searchQuery}"
+                搜索中："{searchQuery}"
               </span>
             )}
           </div>
@@ -299,8 +299,8 @@ export const SlashCommandPicker: React.FC<SlashCommandPickerProps> = ({
         <div className="mt-3">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="default">Default</TabsTrigger>
-              <TabsTrigger value="custom">Custom</TabsTrigger>
+              <TabsTrigger value="default">默认</TabsTrigger>
+              <TabsTrigger value="custom">自定义</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -310,7 +310,7 @@ export const SlashCommandPicker: React.FC<SlashCommandPickerProps> = ({
       <div className="flex-1 overflow-y-auto relative">
         {isLoading && (
           <div className="flex items-center justify-center h-full">
-            <span className="text-sm text-muted-foreground">Loading commands...</span>
+            <span className="text-sm text-muted-foreground">加载命令中…</span>
           </div>
         )}
 
@@ -330,11 +330,11 @@ export const SlashCommandPicker: React.FC<SlashCommandPickerProps> = ({
                   <div className="flex flex-col items-center justify-center h-full">
                     <Command className="h-8 w-8 text-muted-foreground mb-2" />
                     <span className="text-sm text-muted-foreground">
-                      {searchQuery ? 'No commands found' : 'No default commands available'}
+                      {searchQuery ? '未找到命令' : '没有可用的默认命令'}
                     </span>
                     {!searchQuery && (
                       <p className="text-xs text-muted-foreground mt-2 text-center px-4">
-                        Default commands are built-in system commands
+                        默认命令是内置的系统命令
                       </p>
                     )}
                   </div>
@@ -392,11 +392,11 @@ export const SlashCommandPicker: React.FC<SlashCommandPickerProps> = ({
                   <div className="flex flex-col items-center justify-center h-full">
                     <Search className="h-8 w-8 text-muted-foreground mb-2" />
                     <span className="text-sm text-muted-foreground">
-                      {searchQuery ? 'No commands found' : 'No custom commands available'}
+                      {searchQuery ? '未找到命令' : '没有可用的自定义命令'}
                     </span>
                     {!searchQuery && (
                       <p className="text-xs text-muted-foreground mt-2 text-center px-4">
-                        Create commands in <code className="px-1">.claude/commands/</code> or <code className="px-1">~/.claude/commands/</code>
+                        在 <code className="px-1">.claude/commands/</code> 或 <code className="px-1">~/.claude/commands/</code> 中创建命令
                       </p>
                     )}
                   </div>
@@ -433,7 +433,7 @@ export const SlashCommandPicker: React.FC<SlashCommandPickerProps> = ({
                                   </span>
                                   {command.accepts_arguments && (
                                     <span className="text-xs text-muted-foreground">
-                                      [args]
+                                      [参数]
                                     </span>
                                   )}
                                 </div>
@@ -447,7 +447,7 @@ export const SlashCommandPicker: React.FC<SlashCommandPickerProps> = ({
                                 <div className="flex items-center gap-3 mt-1">
                                   {command.allowed_tools.length > 0 && (
                                     <span className="text-xs text-muted-foreground">
-                                      {command.allowed_tools.length} tool{command.allowed_tools.length === 1 ? '' : 's'}
+                                      {command.allowed_tools.length} 个工具
                                     </span>
                                   )}
                                   
@@ -459,7 +459,7 @@ export const SlashCommandPicker: React.FC<SlashCommandPickerProps> = ({
                                   
                                   {command.has_file_references && (
                                     <span className="text-xs text-green-600 dark:text-green-400">
-                                      Files
+                                      文件
                                     </span>
                                   )}
                                 </div>
@@ -507,7 +507,7 @@ export const SlashCommandPicker: React.FC<SlashCommandPickerProps> = ({
                                         </span>
                                         {command.accepts_arguments && (
                                           <span className="text-xs text-muted-foreground">
-                                            [args]
+                                            [参数]
                                           </span>
                                         )}
                                       </div>
@@ -521,7 +521,7 @@ export const SlashCommandPicker: React.FC<SlashCommandPickerProps> = ({
                                       <div className="flex items-center gap-3 mt-1">
                                         {command.allowed_tools.length > 0 && (
                                           <span className="text-xs text-muted-foreground">
-                                            {command.allowed_tools.length} tool{command.allowed_tools.length === 1 ? '' : 's'}
+                                            {command.allowed_tools.length} 个工具
                                           </span>
                                         )}
                                         
@@ -533,7 +533,7 @@ export const SlashCommandPicker: React.FC<SlashCommandPickerProps> = ({
                                         
                                         {command.has_file_references && (
                                           <span className="text-xs text-green-600 dark:text-green-400">
-                                            Files
+                                            文件
                                           </span>
                                         )}
                                       </div>
@@ -557,7 +557,7 @@ export const SlashCommandPicker: React.FC<SlashCommandPickerProps> = ({
       {/* Footer */}
       <div className="border-t border-border p-2">
         <p className="text-xs text-muted-foreground text-center">
-          ↑↓ Navigate • Enter Select • Esc Close
+          ↑↓ 导航 • Enter 选择 • Esc 关闭
         </p>
       </div>
     </motion.div>

@@ -53,7 +53,7 @@ export const MCPManager: React.FC<MCPManagerProps> = ({
       setServers(serverList);
     } catch (err) {
       console.error("MCPManager: Failed to load MCP servers:", err);
-      setError("Failed to load MCP servers. Make sure Claude Code is installed.");
+      setError("加载 MCP 服务器失败。请确保已安装 Claude Code。");
     } finally {
       setLoading(false);
     }
@@ -64,7 +64,7 @@ export const MCPManager: React.FC<MCPManagerProps> = ({
    */
   const handleServerAdded = () => {
     loadServers();
-    setToast({ message: "MCP server added successfully!", type: "success" });
+    setToast({ message: "MCP 服务器添加成功！", type: "success" });
     setActiveTab("servers");
   };
 
@@ -73,7 +73,7 @@ export const MCPManager: React.FC<MCPManagerProps> = ({
    */
   const handleServerRemoved = (name: string) => {
     setServers(prev => prev.filter(s => s.name !== name));
-    setToast({ message: `Server "${name}" removed successfully!`, type: "success" });
+    setToast({ message: `服务器 “${name}” 移除成功！`, type: "success" });
   };
 
   /**
@@ -83,12 +83,12 @@ export const MCPManager: React.FC<MCPManagerProps> = ({
     loadServers();
     if (failed === 0) {
       setToast({ 
-        message: `Successfully imported ${imported} server${imported > 1 ? 's' : ''}!`, 
+        message: `成功导入 ${imported} 个服务器！`,
         type: "success" 
       });
     } else {
       setToast({ 
-        message: `Imported ${imported} server${imported > 1 ? 's' : ''}, ${failed} failed`, 
+        message: `已导入 ${imported} 个服务器，${failed} 个失败`,
         type: "error" 
       });
     }
@@ -101,9 +101,9 @@ export const MCPManager: React.FC<MCPManagerProps> = ({
         <div className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-heading-1">MCP Servers</h1>
+              <h1 className="text-heading-1">MCP 服务器</h1>
               <p className="mt-1 text-body-small text-muted-foreground">
-                Manage Model Context Protocol servers
+                管理 Model Context Protocol 服务器
               </p>
             </div>
           </div>
@@ -134,13 +134,13 @@ export const MCPManager: React.FC<MCPManagerProps> = ({
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid grid-cols-3 w-full max-w-md mb-6 h-auto p-1">
                 <TabsTrigger value="servers" className="py-2.5 px-3">
-                  Servers
+                  服务器
                 </TabsTrigger>
                 <TabsTrigger value="add" className="py-2.5 px-3">
-                  Add Server
+                  添加服务器
                 </TabsTrigger>
                 <TabsTrigger value="import" className="py-2.5 px-3">
-                  Import/Export
+                  导入/导出
                 </TabsTrigger>
               </TabsList>
 

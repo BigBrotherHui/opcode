@@ -54,7 +54,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ tab, isActive }) => {
       setProjects(projectList);
     } catch (err) {
       console.error("Failed to load projects:", err);
-      setError("Failed to load projects. Please ensure ~/.claude directory exists.");
+      setError("加载项目失败。请确保 ~/.claude 目录存在。");
     } finally {
       setLoading(false);
     }
@@ -69,13 +69,13 @@ const TabPanel: React.FC<TabPanelProps> = ({ tab, isActive }) => {
       setSelectedProject(project);
       
       // Update tab title to show project name
-      const projectName = project.path.split('/').pop() || 'Project';
+      const projectName = project.path.split('/').pop() || '项目';
       updateTab(tab.id, {
         title: projectName
       });
     } catch (err) {
       console.error("Failed to load sessions:", err);
-      setError("Failed to load sessions for this project.");
+      setError("加载此项目的会话失败。");
     } finally {
       setLoading(false);
     }
@@ -89,7 +89,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ tab, isActive }) => {
       const selected = await open({
         directory: true,
         multiple: false,
-        title: 'Select Project Folder',
+        title: '选择项目文件夹',
         defaultPath: await api.getHomeDirectory(),
       });
       
@@ -103,14 +103,14 @@ const TabPanel: React.FC<TabPanelProps> = ({ tab, isActive }) => {
       }
     } catch (err) {
       console.error('Failed to open folder picker:', err);
-      setError('Failed to open folder picker');
+      setError('打开文件夹选择器失败');
     }
   };
   
   const handleNewSession = () => {
     // Update current tab to show new chat session instead of creating a new tab
     if (selectedProject) {
-      const projectName = selectedProject.path.split('/').pop() || 'Session';
+      const projectName = selectedProject.path.split('/').pop() || '会话';
       updateTab(tab.id, {
         type: 'chat',
         title: projectName,
@@ -121,7 +121,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ tab, isActive }) => {
     } else {
       updateTab(tab.id, {
         type: 'chat',
-        title: 'New Session',
+        title: '新会话',
         sessionId: undefined,
         sessionData: undefined,
         initialProjectPath: undefined
@@ -156,11 +156,11 @@ const TabPanel: React.FC<TabPanelProps> = ({ tab, isActive }) => {
                                 setSessions([]);
                                 // Restore tab title to "Projects"
                                 updateTab(tab.id, {
-                                  title: 'Projects'
+                                  title: '项目'
                                 });
                               }}
                               className="h-8 w-8 -ml-2"
-                              title="Back to Projects"
+                              title="返回项目列表"
                             >
                               <ArrowLeft className="h-4 w-4" />
                             </Button>
@@ -170,7 +170,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ tab, isActive }) => {
                               {selectedProject.path.split('/').pop()}
                             </h1>
                             <p className="mt-1 text-sm text-muted-foreground">
-                              {`${sessions.length} session${sessions.length !== 1 ? 's' : ''}`}
+                              {`${sessions.length} 个会话`}
                             </p>
                           </div>
                         </div>
@@ -183,7 +183,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ tab, isActive }) => {
                             size="default"
                           >
                             <Plus className="mr-2 h-4 w-4" />
-                            New session
+                            新建会话
                           </Button>
                         </motion.div>
                       </div>
@@ -217,7 +217,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ tab, isActive }) => {
                           // Update current tab to show the selected session
                           updateTab(tab.id, {
                             type: 'chat',
-                            title: session.project_path.split('/').pop() || 'Session',
+                            title: session.project_path.split('/').pop() || '会话',
                             sessionId: session.id,
                             sessionData: session,
                             initialProjectPath: session.project_path
@@ -260,7 +260,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ tab, isActive }) => {
               }}
               onProjectPathChange={(path: string) => {
                 // Update tab title with directory name
-                const dirName = path.split('/').pop() || path.split('\\').pop() || 'Session';
+                const dirName = path.split('/').pop() || path.split('\\').pop() || '会话';
                 updateTab(tab.id, {
                   title: dirName
                 });
@@ -273,7 +273,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ tab, isActive }) => {
         if (!tab.agentRunId) {
           return (
             <div className="h-full">
-              <div className="p-4">No agent run ID specified</div>
+              <div className="p-4">未指定智能体运行 ID</div>
             </div>
           );
         }
@@ -323,15 +323,15 @@ const TabPanel: React.FC<TabPanelProps> = ({ tab, isActive }) => {
       
       case 'claude-file':
         if (!tab.claudeFileId) {
-          return <div className="p-4">No Claude file ID specified</div>;
+          return <div className="p-4">未指定 Claude 文件 ID</div>;
         }
         // Note: We need to get the actual file object for ClaudeFileEditor
         // For now, returning a placeholder
-        return <div className="p-4">Claude file editor not yet implemented in tabs</div>;
+        return <div className="p-4">标签页中尚未实现 Claude 文件编辑器</div>;
       
       case 'agent-execution':
         if (!tab.agentData) {
-          return <div className="p-4">No agent data specified</div>;
+          return <div className="p-4">未指定智能体数据</div>;
         }
         return (
           <AgentExecution
@@ -360,14 +360,14 @@ const TabPanel: React.FC<TabPanelProps> = ({ tab, isActive }) => {
         // TODO: Implement import agent component
         return (
           <div className="h-full">
-            <div className="p-4">Import agent functionality coming soon...</div>
+            <div className="p-4">导入智能体功能即将推出…</div>
           </div>
         );
       
       default:
         return (
           <div className="h-full">
-            <div className="p-4">Unknown tab type: {tab.type}</div>
+            <div className="p-4">未知标签页类型：{tab.type}</div>
           </div>
         );
     }
@@ -411,12 +411,12 @@ export const TabContent: React.FC = () => {
         // Update existing tab with session data and switch to it
         updateTab(existingTab.id, {
           sessionData: session,
-          title: session.project_path.split('/').pop() || 'Session'
+          title: session.project_path.split('/').pop() || '会话'
         });
         window.dispatchEvent(new CustomEvent('switch-to-tab', { detail: { tabId: existingTab.id } }));
       } else {
         // Create new tab for this session
-        const projectName = session.project_path.split('/').pop() || 'Session';
+        const projectName = session.project_path.split('/').pop() || '会话';
         const newTabId = createChatTab(session.id, projectName, session.project_path);
         // Update the new tab with session data
         updateTab(newTabId, {
@@ -457,7 +457,7 @@ export const TabContent: React.FC = () => {
         // If tab exists, just switch to it
         updateTab(existingTab.id, {
           sessionData: session,
-          title: session.project_path.split('/').pop() || 'Session',
+          title: session.project_path.split('/').pop() || '会话',
         });
         window.dispatchEvent(new CustomEvent('switch-to-tab', { detail: { tabId: existingTab.id } }));
       } else {
@@ -467,13 +467,13 @@ export const TabContent: React.FC = () => {
         if (currentTab && currentTab.type === 'projects') {
           updateTab(currentTab.id, {
             type: 'chat',
-            title: session.project_path.split('/').pop() || 'Session',
+            title: session.project_path.split('/').pop() || '会话',
             sessionId: session.id,
             sessionData: session,
             initialProjectPath: session.project_path
           });
         } else {
-          const projectName = session.project_path.split('/').pop() || 'Session';
+          const projectName = session.project_path.split('/').pop() || '会话';
           const newTabId = createChatTab(session.id, projectName, session.project_path);
           updateTab(newTabId, {
             sessionData: session,
@@ -516,14 +516,14 @@ export const TabContent: React.FC = () => {
       {tabs.length === 0 && (
         <div className="flex items-center justify-center h-full text-muted-foreground">
           <div className="text-center">
-            <p className="text-lg mb-2">No projects open</p>
-            <p className="text-sm mb-4">Click to start a new project</p>
+            <p className="text-lg mb-2">没有打开的项目</p>
+            <p className="text-sm mb-4">点击开始一个新项目</p>
             <Button
               onClick={() => createProjectsTab()}
               size="default"
             >
               <Plus className="w-4 h-4 mr-2" />
-              New Project
+              新建项目
             </Button>
           </div>
         </div>

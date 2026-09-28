@@ -54,7 +54,7 @@ export const Agents: React.FC = () => {
       setAgents(agents);
     } catch (error) {
       console.error('Failed to load agents:', error);
-      setToast({ message: 'Failed to load agents', type: 'error' });
+      setToast({ message: '加载智能体失败', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -71,7 +71,7 @@ export const Agents: React.FC = () => {
 
   const handleRunAgent = async (agent: Agent) => {
     if (!agent.id) {
-      setToast({ message: 'Agent ID is missing', type: 'error' });
+      setToast({ message: '缺少智能体 ID', type: 'error' });
       return;
     }
     
@@ -83,7 +83,7 @@ export const Agents: React.FC = () => {
       const projectPath = await open({
         directory: true,
         multiple: false,
-        title: `Select project directory for ${agent.name}`
+        title: `为 ${agent.name} 选择项目目录`
       });
       
       if (!projectPath) {
@@ -97,10 +97,10 @@ export const Agents: React.FC = () => {
         detail: { agent, tabId, projectPath } 
       }));
       
-      setToast({ message: `Opening agent: ${agent.name}`, type: 'success' });
+      setToast({ message: `正在打开智能体：${agent.name}`, type: 'success' });
     } catch (error) {
       console.error('Failed to open agent:', error);
-      setToast({ message: `Failed to open agent: ${agent.name}`, type: 'error' });
+      setToast({ message: `打开智能体失败：${agent.name}`, type: 'error' });
     }
   };
 
@@ -109,13 +109,13 @@ export const Agents: React.FC = () => {
     
     try {
       await api.deleteAgent(agentToDelete.id);
-      setToast({ message: `Deleted agent: ${agentToDelete.name}`, type: 'success' });
+      setToast({ message: `已删除智能体：${agentToDelete.name}`, type: 'success' });
       setAgents(prev => prev.filter(a => a.id !== agentToDelete.id));
       setShowDeleteDialog(false);
       setAgentToDelete(null);
     } catch (error) {
       console.error('Failed to delete agent:', error);
-      setToast({ message: `Failed to delete agent: ${agentToDelete.name}`, type: 'error' });
+      setToast({ message: `删除智能体失败：${agentToDelete.name}`, type: 'error' });
     }
   };
 
@@ -123,20 +123,20 @@ export const Agents: React.FC = () => {
     try {
       const selected = await openDialog({
         filters: [
-          { name: 'opcode Agent', extensions: ['opcode.json', 'json'] },
-          { name: 'All Files', extensions: ['*'] }
+          { name: 'opcode 智能体', extensions: ['opcode.json', 'json'] },
+          { name: '所有文件', extensions: ['*'] }
         ],
         multiple: false,
       });
 
       if (selected) {
         const importedAgent = await api.importAgentFromFile(selected as string);
-        setToast({ message: `Imported agent: ${importedAgent.name}`, type: 'success' });
+        setToast({ message: `已导入智能体：${importedAgent.name}`, type: 'success' });
         loadAgents();
       }
     } catch (error) {
       console.error('Failed to import agent:', error);
-      setToast({ message: 'Failed to import agent', type: 'error' });
+      setToast({ message: '导入智能体失败', type: 'error' });
     }
   };
 
@@ -145,17 +145,17 @@ export const Agents: React.FC = () => {
       const path = await save({
         defaultPath: `${agent.name.toLowerCase().replace(/\s+/g, '-')}.opcode.json`,
         filters: [
-          { name: 'opcode Agent', extensions: ['opcode.json'] }
+          { name: 'opcode 智能体', extensions: ['opcode.json'] }
         ]
       });
 
       if (path && agent.id) {
         await invoke('export_agent_to_file', { id: agent.id, filePath: path });
-        setToast({ message: `Exported agent: ${agent.name}`, type: 'success' });
+        setToast({ message: `已导出智能体：${agent.name}`, type: 'success' });
       }
     } catch (error) {
       console.error('Failed to export agent:', error);
-      setToast({ message: 'Failed to export agent', type: 'error' });
+      setToast({ message: '导出智能体失败', type: 'error' });
     }
   };
 
@@ -206,9 +206,9 @@ export const Agents: React.FC = () => {
         <div className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Agents</h1>
+              <h1 className="text-3xl font-bold tracking-tight">智能体</h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Manage your Claude Code agents
+                管理你的 Claude Code 智能体
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -216,25 +216,25 @@ export const Agents: React.FC = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
                     <Import className="w-4 h-4 mr-2" />
-                    Import
+                    导入
                     <ChevronDown className="w-4 h-4 ml-2" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={handleImportFromFile}>
                     <FileJson className="w-4 h-4 mr-2" />
-                    From File
+                    从文件导入
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setShowGitHubBrowser(true)}>
                     <Globe className="w-4 h-4 mr-2" />
-                    From GitHub
+                    从 GitHub 导入
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
               <Button onClick={() => setShowCreateAgent(true)}>
                 <Plus className="w-4 h-4 mr-2" />
-                Create Agent
+                创建智能体
               </Button>
             </div>
           </div>
@@ -265,7 +265,7 @@ export const Agents: React.FC = () => {
           onImportSuccess={() => {
             loadAgents();
             setShowGitHubBrowser(false);
-            setToast({ message: 'Agent imported successfully', type: 'success' });
+            setToast({ message: '智能体已导入', type: 'success' });
           }}
         />
       )}
@@ -286,22 +286,22 @@ export const Agents: React.FC = () => {
               className="bg-card p-6 rounded-lg shadow-lg max-w-md w-full mx-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-lg font-semibold mb-4">Delete Agent</h3>
+              <h3 className="text-lg font-semibold mb-4">删除智能体</h3>
               <p className="text-muted-foreground mb-6">
-                Are you sure you want to delete "{agentToDelete.name}"? This action cannot be undone.
+                确定要删除"{agentToDelete.name}"吗？此操作无法撤销。
               </p>
               <div className="flex gap-3 justify-end">
                 <Button
                   variant="outline"
                   onClick={() => setShowDeleteDialog(false)}
                 >
-                  Cancel
+                  取消
                 </Button>
                 <Button
                   variant="destructive"
                   onClick={handleDeleteAgent}
                 >
-                  Delete
+                  删除
                 </Button>
               </div>
             </motion.div>
@@ -315,11 +315,11 @@ export const Agents: React.FC = () => {
             <TabsList className="grid grid-cols-2 w-full max-w-md mb-6 h-auto p-1">
               <TabsTrigger value="agents" className="py-2.5 px-3">
                 <Bot className="w-4 h-4 mr-2" />
-                Agents ({agents.length})
+                智能体 ({agents.length})
               </TabsTrigger>
               <TabsTrigger value="running" className="py-2.5 px-3">
                 <History className="w-4 h-4 mr-2" />
-                History ({runningAgents.length})
+                历史记录 ({runningAgents.length})
               </TabsTrigger>
             </TabsList>
 
@@ -331,13 +331,13 @@ export const Agents: React.FC = () => {
               ) : agents.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-64 text-center">
                   <Bot className="w-12 h-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No Agents Yet</h3>
+                  <h3 className="text-lg font-semibold mb-2">暂无智能体</h3>
                   <p className="text-muted-foreground mb-4">
-                    Create your first agent to get started
+                    创建你的第一个智能体，开始使用
                   </p>
                   <Button onClick={() => setShowCreateAgent(true)}>
                     <Plus className="w-4 h-4 mr-2" />
-                    Create Agent
+                    创建智能体
                   </Button>
                 </div>
               ) : (
@@ -361,15 +361,15 @@ export const Agents: React.FC = () => {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => setEditingAgent(agent)}>
                               <Edit className="w-4 h-4 mr-2" />
-                              Edit
+                              编辑
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleRunAgent(agent)}>
                               <Play className="w-4 h-4 mr-2" />
-                              Run
+                              运行
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleExportAgent(agent)}>
                               <Download className="w-4 h-4 mr-2" />
-                              Export
+                              导出
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               onClick={() => {
@@ -379,14 +379,14 @@ export const Agents: React.FC = () => {
                               className="text-destructive"
                             >
                               <Trash2 className="w-4 h-4 mr-2" />
-                              Delete
+                              删除
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
 
                       <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                        No description provided
+                        暂无描述
                       </p>
 
                       <div className="flex items-center justify-between">
@@ -398,7 +398,7 @@ export const Agents: React.FC = () => {
                           onClick={() => handleRunAgent(agent)}
                         >
                           <Play className="w-3 h-3 mr-1" />
-                          Run
+                          运行
                         </Button>
                       </div>
                     </Card>
@@ -412,9 +412,9 @@ export const Agents: React.FC = () => {
                 <Card className="p-12">
                   <div className="flex flex-col items-center justify-center text-center">
                     <History className="w-12 h-12 text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No Agent History</h3>
+                    <h3 className="text-lg font-semibold mb-2">暂无历史记录</h3>
                     <p className="text-muted-foreground">
-                      Run an agent to see it here
+                      运行智能体后将在此处显示
                     </p>
                   </div>
                 </Card>
@@ -445,22 +445,22 @@ export const Agents: React.FC = () => {
 
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
-                          <span className="text-muted-foreground">Started:</span>
+                          <span className="text-muted-foreground">开始时间：</span>
                           <p className="font-medium">{new Date(run.created_at).toLocaleString()}</p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Duration:</span>
+                          <span className="text-muted-foreground">运行时长：</span>
                           <p className="font-medium">{run.metrics?.duration_ms ? `${(run.metrics.duration_ms / 1000).toFixed(1)}s` : run.duration_ms ? `${(run.duration_ms / 1000).toFixed(1)}s` : '—'}</p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Tokens:</span>
+                          <span className="text-muted-foreground">Token：</span>
                           <p className="font-medium">{run.metrics?.total_tokens ? run.metrics.total_tokens.toLocaleString() : run.total_tokens ? run.total_tokens.toLocaleString() : '—'}</p>
                         </div>
                       </div>
 
                       {run.status === 'failed' && (
                         <div className="mt-3 p-2 bg-destructive/10 rounded text-sm text-destructive">
-                          Agent execution failed
+                          智能体执行失败
                         </div>
                       )}
                     </Card>

@@ -70,7 +70,7 @@ export const SessionHeader: React.FC<SessionHeaderProps> = React.memo(({
           
           <div className="flex items-center gap-2">
             <Terminal className="h-5 w-5 text-primary" />
-            <span className="font-semibold">Claude Code Session</span>
+            <span className="font-semibold">Claude Code 会话</span>
           </div>
 
           
@@ -82,7 +82,7 @@ export const SessionHeader: React.FC<SessionHeaderProps> = React.memo(({
               className="flex items-center gap-2"
             >
               <FolderOpen className="h-4 w-4" />
-              Select Project
+              选择项目
             </Button>
           )}
         </div>
@@ -96,7 +96,7 @@ export const SessionHeader: React.FC<SessionHeaderProps> = React.memo(({
               </Badge>
               {totalTokens > 0 && (
                 <Badge variant="secondary" className="text-xs">
-                  {totalTokens.toLocaleString()} tokens
+                  {totalTokens.toLocaleString()} Token
                 </Badge>
               )}
             </div>
@@ -119,7 +119,7 @@ export const SessionHeader: React.FC<SessionHeaderProps> = React.memo(({
                     className="w-full justify-start"
                     onClick={onCopyAsJsonl}
                   >
-                    Copy as JSONL
+                    复制为 JSONL
                   </Button>
                   <Button
                     variant="ghost"
@@ -127,7 +127,7 @@ export const SessionHeader: React.FC<SessionHeaderProps> = React.memo(({
                     className="w-full justify-start"
                     onClick={onCopyAsMarkdown}
                   >
-                    Copy as Markdown
+                    复制为 Markdown
                   </Button>
                 </div>
               }
@@ -157,13 +157,13 @@ export const SessionHeader: React.FC<SessionHeaderProps> = React.memo(({
               {onProjectSettings && projectPath && (
                 <DropdownMenuItem onClick={onProjectSettings}>
                   <Settings className="h-4 w-4 mr-2" />
-                  Project Settings
+                  项目设置
                 </DropdownMenuItem>
               )}
               {onSlashCommandsSettings && projectPath && (
                 <DropdownMenuItem onClick={onSlashCommandsSettings}>
                   <Command className="h-4 w-4 mr-2" />
-                  Slash Commands
+                  斜杠命令
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>

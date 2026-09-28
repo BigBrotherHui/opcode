@@ -43,13 +43,13 @@ export function ProxySettings({ setToast, onChange }: ProxySettingsProps) {
       await invoke('save_proxy_settings', { settings });
       setOriginalSettings(settings);
       setToast({
-        message: 'Proxy settings saved and applied successfully.',
+        message: '代理设置已保存并生效。',
         type: 'success',
       });
     } catch (error) {
       console.error('Failed to save proxy settings:', error);
       setToast({
-        message: 'Failed to save proxy settings',
+        message: '保存代理设置失败',
         type: 'error',
       });
       throw error; // Re-throw to let parent handle the error
@@ -72,7 +72,7 @@ export function ProxySettings({ setToast, onChange }: ProxySettingsProps) {
     } catch (error) {
       console.error('Failed to load proxy settings:', error);
       setToast({
-        message: 'Failed to load proxy settings',
+        message: '加载代理设置失败',
         type: 'error',
       });
     }
@@ -89,18 +89,18 @@ export function ProxySettings({ setToast, onChange }: ProxySettingsProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium">Proxy Settings</h3>
+        <h3 className="text-lg font-medium">代理设置</h3>
         <p className="text-sm text-muted-foreground">
-          Configure proxy settings for Claude API requests
+          配置 Claude API 请求使用的代理设置
         </p>
       </div>
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="proxy-enabled">Enable Proxy</Label>
+            <Label htmlFor="proxy-enabled">启用代理</Label>
             <p className="text-sm text-muted-foreground">
-              Use proxy for all Claude API requests
+              为所有 Claude API 请求使用代理
             </p>
           </div>
           <Switch
@@ -112,7 +112,7 @@ export function ProxySettings({ setToast, onChange }: ProxySettingsProps) {
 
         <div className="space-y-4" style={{ opacity: settings.enabled ? 1 : 0.5 }}>
           <div className="space-y-2">
-            <Label htmlFor="http-proxy">HTTP Proxy</Label>
+            <Label htmlFor="http-proxy">HTTP 代理</Label>
             <Input
               id="http-proxy"
               placeholder="http://proxy.example.com:8080"
@@ -123,7 +123,7 @@ export function ProxySettings({ setToast, onChange }: ProxySettingsProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="https-proxy">HTTPS Proxy</Label>
+            <Label htmlFor="https-proxy">HTTPS 代理</Label>
             <Input
               id="https-proxy"
               placeholder="http://proxy.example.com:8080"
@@ -134,7 +134,7 @@ export function ProxySettings({ setToast, onChange }: ProxySettingsProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="no-proxy">No Proxy</Label>
+            <Label htmlFor="no-proxy">代理例外</Label>
             <Input
               id="no-proxy"
               placeholder="localhost,127.0.0.1,.example.com"
@@ -143,12 +143,12 @@ export function ProxySettings({ setToast, onChange }: ProxySettingsProps) {
               disabled={!settings.enabled}
             />
             <p className="text-xs text-muted-foreground">
-              Comma-separated list of hosts that should bypass the proxy
+              以逗号分隔、不经过代理的主机列表
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="all-proxy">All Proxy (Optional)</Label>
+            <Label htmlFor="all-proxy">全局代理（可选）</Label>
             <Input
               id="all-proxy"
               placeholder="socks5://proxy.example.com:1080"
@@ -157,7 +157,7 @@ export function ProxySettings({ setToast, onChange }: ProxySettingsProps) {
               disabled={!settings.enabled}
             />
             <p className="text-xs text-muted-foreground">
-              Proxy URL to use for all protocols if protocol-specific proxies are not set
+              未设置特定协议的代理时，所有协议使用的代理 URL
             </p>
           </div>
         </div>

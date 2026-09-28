@@ -93,7 +93,7 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
       }
     } catch (err) {
       console.error("Failed to load timeline:", err);
-      setError("Failed to load timeline");
+      setError("加载时间线失败");
     } finally {
       setIsLoading(false);
     }
@@ -146,14 +146,14 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
       await loadTimeline();
     } catch (err) {
       console.error("Failed to create checkpoint:", err);
-      setError("Failed to create checkpoint");
+      setError("创建检查点失败");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleRestoreCheckpoint = async (checkpoint: Checkpoint) => {
-    if (!confirm(`Restore to checkpoint "${checkpoint.description || checkpoint.id.slice(0, 8)}"? Current state will be saved as a new checkpoint.`)) {
+    if (!confirm(`恢复到检查点 "${checkpoint.description || checkpoint.id.slice(0, 8)}"？当前状态将保存为新的检查点。`)) {
       return;
     }
 
@@ -170,7 +170,7 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
         projectId,
         projectPath,
         currentMessageIndex,
-        "Auto-save before restore"
+        "恢复前自动保存"
       );
       
       // Then restore
@@ -186,7 +186,7 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
       onCheckpointSelect(checkpoint);
     } catch (err) {
       console.error("Failed to restore checkpoint:", err);
-      setError("Failed to restore checkpoint");
+      setError("恢复检查点失败");
     } finally {
       setIsLoading(false);
     }
@@ -228,7 +228,7 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
       setShowDiffDialog(true);
     } catch (err) {
       console.error("Failed to get diff:", err);
-      setError("Failed to compare checkpoints");
+      setError("对比检查点失败");
     } finally {
       setIsLoading(false);
     }
@@ -305,7 +305,7 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     {isCurrent && (
-                      <Badge variant="default" className="text-xs">Current</Badge>
+                      <Badge variant="default" className="text-xs">当前</Badge>
                     )}
                     <span className="text-xs font-mono text-muted-foreground">
                       {node.checkpoint.id.slice(0, 8)}
@@ -320,17 +320,17 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
                   )}
                   
                   <p className="text-xs text-muted-foreground line-clamp-2">
-                    {node.checkpoint.metadata.userPrompt || "No prompt"}
+                    {node.checkpoint.metadata.userPrompt || "无提示词"}
                   </p>
                   
                   <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Hash className="h-3 w-3" />
-                      {node.checkpoint.metadata.totalTokens.toLocaleString()} tokens
+                      {node.checkpoint.metadata.totalTokens.toLocaleString()} Token
                     </span>
                     <span className="flex items-center gap-1">
                       <FileCode className="h-3 w-3" />
-                      {node.checkpoint.metadata.fileChanges} files
+                      {node.checkpoint.metadata.fileChanges} 个文件
                     </span>
                   </div>
                 </div>
@@ -352,7 +352,7 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
                           <RotateCcw className="h-3 w-3" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>Restore to this checkpoint</TooltipContent>
+                      <TooltipContent>恢复到此检查点</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                   
@@ -371,7 +371,7 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
                           <GitFork className="h-3 w-3" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>Fork from this checkpoint</TooltipContent>
+                      <TooltipContent>从此检查点分叉</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                   
@@ -390,7 +390,7 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
                           <Diff className="h-3 w-3" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>Compare with another checkpoint</TooltipContent>
+                      <TooltipContent>与其他检查点对比</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </div>
@@ -426,9 +426,9 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
         <div className="flex items-start gap-2">
           <AlertCircle className="h-4 w-4 text-yellow-600 mt-0.5" />
           <div className="text-xs">
-            <p className="font-medium text-yellow-600">Experimental Feature</p>
+            <p className="font-medium text-yellow-600">实验性功能</p>
             <p className="text-yellow-600/80">
-              Checkpointing may affect directory structure or cause data loss. Use with caution.
+              检查点功能可能影响目录结构或导致数据丢失，请谨慎使用。
             </p>
           </div>
         </div>
@@ -438,10 +438,10 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <GitBranch className="h-5 w-5 text-muted-foreground" />
-          <h3 className="text-sm font-medium">Timeline</h3>
+          <h3 className="text-sm font-medium">时间线</h3>
           {timeline && (
             <Badge variant="outline" className="text-xs">
-              {timeline.totalCheckpoints} checkpoints
+              {timeline.totalCheckpoints} 个检查点
             </Badge>
           )}
         </div>
@@ -453,7 +453,7 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
           disabled={isLoading}
         >
           <Save className="h-3 w-3 mr-1" />
-          Checkpoint
+          检查点
         </Button>
       </div>
       
@@ -472,7 +472,7 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
         </div>
       ) : (
         <div className="text-center py-8 text-sm text-muted-foreground">
-          {isLoading ? "Loading timeline..." : "No checkpoints yet"}
+          {isLoading ? "时间线加载中…" : "暂无检查点"}
         </div>
       )}
       
@@ -480,18 +480,18 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create Checkpoint</DialogTitle>
+            <DialogTitle>创建检查点</DialogTitle>
             <DialogDescription>
-              Save the current state of your session with an optional description.
+              保存会话的当前状态，可附加描述。
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="description">Description (optional)</Label>
+              <Label htmlFor="description">描述（可选）</Label>
               <Input
                 id="description"
-                placeholder="e.g., Before major refactoring"
+                placeholder="例如：大规模重构前"
                 value={checkpointDescription}
                 onChange={(e) => setCheckpointDescription(e.target.value)}
                 onKeyDown={(e) => {
@@ -514,13 +514,13 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
               onClick={() => setShowCreateDialog(false)}
               disabled={isLoading}
             >
-              Cancel
+              取消
             </Button>
             <Button
               onClick={handleCreateCheckpoint}
               disabled={isLoading}
             >
-              Create Checkpoint
+              创建检查点
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -530,10 +530,10 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
       <Dialog open={showDiffDialog} onOpenChange={setShowDiffDialog}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Checkpoint Comparison</DialogTitle>
+            <DialogTitle>检查点对比</DialogTitle>
             <DialogDescription>
-              Changes between "{selectedCheckpoint?.description || selectedCheckpoint?.id.slice(0, 8)}" 
-              and "{compareCheckpoint?.description || compareCheckpoint?.id.slice(0, 8)}"
+              "{selectedCheckpoint?.description || selectedCheckpoint?.id.slice(0, 8)}" 与
+              "{compareCheckpoint?.description || compareCheckpoint?.id.slice(0, 8)}" 之间的更改
             </DialogDescription>
           </DialogHeader>
           
@@ -543,19 +543,19 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
               <div className="grid grid-cols-3 gap-4">
                 <Card>
                   <CardContent className="p-3">
-                    <div className="text-xs text-muted-foreground">Modified Files</div>
+                    <div className="text-xs text-muted-foreground">修改文件</div>
                     <div className="text-2xl font-bold">{diff.modifiedFiles.length}</div>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-3">
-                    <div className="text-xs text-muted-foreground">Added Files</div>
+                    <div className="text-xs text-muted-foreground">新增文件</div>
                     <div className="text-2xl font-bold text-green-600">{diff.addedFiles.length}</div>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-3">
-                    <div className="text-xs text-muted-foreground">Deleted Files</div>
+                    <div className="text-xs text-muted-foreground">删除文件</div>
                     <div className="text-2xl font-bold text-red-600">{diff.deletedFiles.length}</div>
                   </CardContent>
                 </Card>
@@ -564,14 +564,14 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
               {/* Token delta */}
               <div className="flex items-center justify-center">
                 <Badge variant={diff.tokenDelta > 0 ? "default" : "secondary"}>
-                  {diff.tokenDelta > 0 ? "+" : ""}{diff.tokenDelta.toLocaleString()} tokens
+                  {diff.tokenDelta > 0 ? "+" : ""}{diff.tokenDelta.toLocaleString()} Token
                 </Badge>
               </div>
               
               {/* File lists */}
               {diff.modifiedFiles.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-medium mb-2">Modified Files</h4>
+                  <h4 className="text-sm font-medium mb-2">修改文件</h4>
                   <div className="space-y-1">
                     {diff.modifiedFiles.map((file) => (
                       <div key={file.path} className="flex items-center justify-between text-xs">
@@ -588,7 +588,7 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
               
               {diff.addedFiles.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-medium mb-2">Added Files</h4>
+                  <h4 className="text-sm font-medium mb-2">新增文件</h4>
                   <div className="space-y-1">
                     {diff.addedFiles.map((file) => (
                       <div key={file} className="text-xs font-mono text-green-600">
@@ -601,7 +601,7 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
               
               {diff.deletedFiles.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-medium mb-2">Deleted Files</h4>
+                  <h4 className="text-sm font-medium mb-2">删除文件</h4>
                   <div className="space-y-1">
                     {diff.deletedFiles.map((file) => (
                       <div key={file} className="text-xs font-mono text-red-600">
@@ -623,7 +623,7 @@ export const TimelineNavigator: React.FC<TimelineNavigatorProps> = ({
                 setCompareCheckpoint(null);
               }}
             >
-              Close
+              关闭
             </Button>
           </DialogFooter>
         </DialogContent>

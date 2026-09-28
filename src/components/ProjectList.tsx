@@ -118,9 +118,9 @@ export const ProjectList: React.FC<ProjectListProps> = ({
         <div className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">Projects</h1>
+              <h1 className="text-3xl font-bold">项目</h1>
               <p className="mt-1 text-body-small text-muted-foreground">
-                Select a project to start working with Claude Code
+                选择一个项目，开始使用 Claude Code
               </p>
             </div>
             <motion.div
@@ -133,7 +133,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                 className="flex items-center gap-2"
               >
                 <FolderOpen className="h-4 w-4" />
-                Open Project
+                打开项目
               </Button>
             </motion.div>
           </div>
@@ -145,20 +145,20 @@ export const ProjectList: React.FC<ProjectListProps> = ({
           {displayedProjects.length > 0 ? (
             <Card className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-heading-4">Recent Projects</h2>
+                <h2 className="text-heading-4">最近项目</h2>
             {!showAll ? (
               <button 
                 onClick={handleViewAll}
                 className="text-caption text-muted-foreground hover:text-foreground transition-colors"
               >
-                View all ({projects.length})
+                查看全部（{projects.length}）
               </button>
             ) : (
               <button 
                 onClick={handleViewLess}
                 className="text-caption text-muted-foreground hover:text-foreground transition-colors"
               >
-                View less
+                收起
               </button>
             )}
           </div>
@@ -245,9 +245,9 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                 <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                   <FolderOpen className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="text-heading-3 mb-2">No recent projects</h3>
+                <h3 className="text-heading-3 mb-2">暂无最近项目</h3>
                 <p className="text-body-small text-muted-foreground mb-6">
-                  Open a project to get started with Claude Code
+                  打开一个项目，开始使用 Claude Code
                 </p>
                 <motion.div
                   whileTap={{ scale: 0.97 }}
@@ -259,7 +259,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                     className="flex items-center gap-2"
                   >
                     <FolderOpen className="h-4 w-4" />
-                    Open Your First Project
+                    打开你的第一个项目
                   </Button>
                 </motion.div>
               </div>
