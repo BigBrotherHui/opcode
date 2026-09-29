@@ -1216,6 +1216,19 @@ async fn spawn_claude_process(
         *current_process = Some(child);
     }
 
+    // ── 流式看门狗 ──
+    // 上游卡住（中转挂起/网络黑洞）时 CLI 进程长时间零输出，前端 isLoading 永久
+    // 卡死、后续消息静默入队。看门狗跟踪 stdout/stderr 的最后活跃时间，超过阈值
+    // 无任何输出即杀进程并向两端发 error+complete，让 UI 出错提示、队列恢复流动。
+    // 阈值默认 300 秒（正常思考/工具执行期间 stream-json 会持续产出事件喂活它，
+    // 不会误伤）；可用环境变量 OPCODE_WATCHDOG_SECS 覆盖（测试用）。
+    let watchdog_secs = std::env::var("OPCODE_WATCHDOG_SECS")
+        .ok()
+        .and_then(|v| v.parse::<u64>().ok())
+        .unwrap_or(300);
+    let last_activity = std::sync::Arc::new(std::sync::Mutex::new(std::time::Instant::now()));
+    let watchdog_finished = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+
     // Spawn tasks to read stdout and stderr
     let app_handle = app.clone();
     let session_id_holder_clone = session_id_holder.clone();
@@ -1225,9 +1238,11 @@ async fn spawn_claude_process(
     let project_path_clone = project_path.clone();
     let prompt_clone = prompt.clone();
     let model_clone = model.clone();
+    let last_activity_stdout = last_activity.clone();
     let stdout_task = tokio::spawn(async move {
         let mut lines = stdout_reader.lines();
         while let Ok(Some(line)) = lines.next_line().await {
+            *last_activity_stdout.lock().unwrap() = std::time::Instant::now();
             log::debug!("Claude stdout: {}", line);
 
             // Parse the line to check for init message with session ID
@@ -1277,9 +1292,11 @@ async fn spawn_claude_process(
 
     let app_handle_stderr = app.clone();
     let session_id_holder_clone2 = session_id_holder.clone();
+    let last_activity_stderr = last_activity.clone();
     let stderr_task = tokio::spawn(async move {
         let mut lines = stderr_reader.lines();
         while let Ok(Some(line)) = lines.next_line().await {
+            *last_activity_stderr.lock().unwrap() = std::time::Instant::now();
             log::error!("Claude stderr: {}", line);
             // Emit error lines to the frontend with session isolation if we have session ID
             if let Some(ref session_id) = *session_id_holder_clone2.lock().unwrap() {
@@ -1296,6 +1313,7 @@ async fn spawn_claude_process(
     let session_id_holder_clone3 = session_id_holder.clone();
     let run_id_holder_clone2 = run_id_holder.clone();
     let registry_clone2 = registry.0.clone();
+    let watchdog_finished_wait = watchdog_finished.clone();
     tokio::spawn(async move {
         let _ = stdout_task.await;
         let _ = stderr_task.await;
@@ -1334,8 +1352,48 @@ async fn spawn_claude_process(
             let _ = registry_clone2.unregister_process(run_id);
         }
 
+        // 流已结束：叫停看门狗（在锁外设置，避免与看门狗的取进程竞争拖到下一次 tick）
+        watchdog_finished_wait.store(true, std::sync::atomic::Ordering::Relaxed);
+
         // Clear the process from state
         *current_process = None;
+    });
+
+    // 看门狗任务：周期检查无输出时长，超阈值杀进程并向两端发 error+complete，
+    // 前端由此清 isLoading、展示错误、恢复消息队列流动。
+    let app_handle_watchdog = app.clone();
+    let claude_state_watchdog = claude_state.current_process.clone();
+    let last_activity_watchdog = last_activity.clone();
+    let session_id_holder_watchdog = session_id_holder.clone();
+    let watchdog_finished_watchdog = watchdog_finished.clone();
+    tokio::spawn(async move {
+        let mut tick = tokio::time::interval(tokio::time::Duration::from_secs(10));
+        tick.tick().await; // interval 的首个 tick 立即完成，跳过
+        loop {
+            tick.tick().await;
+            if watchdog_finished_watchdog.load(std::sync::atomic::Ordering::Relaxed) {
+                return;
+            }
+            let silent = last_activity_watchdog.lock().unwrap().elapsed().as_secs();
+            if silent < watchdog_secs {
+                continue;
+            }
+            log::warn!("Claude watchdog: {} 秒无任何输出，终止挂起的请求", silent);
+            if let Some(mut child) = claude_state_watchdog.lock().await.take() {
+                let _ = child.kill().await;
+            }
+            let msg = format!(
+                "请求已自动终止：超过 {} 秒没有任何输出（上游卡住或网络挂起）。请直接重发消息；持续出现请检查中转/网络状态。",
+                silent
+            );
+            if let Some(ref session_id) = *session_id_holder_watchdog.lock().unwrap() {
+                let _ = app_handle_watchdog.emit(&format!("claude-error:{}", session_id), &msg);
+                let _ = app_handle_watchdog.emit(&format!("claude-complete:{}", session_id), false);
+            }
+            let _ = app_handle_watchdog.emit("claude-error", &msg);
+            let _ = app_handle_watchdog.emit("claude-complete", false);
+            return;
+        }
     });
 
     Ok(())
