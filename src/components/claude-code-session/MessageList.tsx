@@ -1,10 +1,104 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { StreamMessage } from '../StreamMessage';
 import { Terminal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ClaudeStreamMessage } from '../AgentExecution';
+
+// ── 工具轮次折叠 ──
+// 长 agent 任务的每一轮（助手碎碎念 + 工具调用 + 工具结果）都会各占一张大卡片，
+// 几十轮下来刷屏。这里把连续的工具轮次归并成一个可展开的"执行过程"块：
+// 折叠时只显示步骤数与工具统计，展开时用 StreamMessage 原样渲染每一轮细节。
+
+type DisplayItem =
+  | { kind: 'msg'; msg: ClaudeStreamMessage; index: number }
+  | { kind: 'steps'; items: ClaudeStreamMessage[]; startIndex: number };
+
+const hasToolUse = (m: ClaudeStreamMessage): boolean =>
+  !!m && Array.isArray(m.message?.content) &&
+  m.message.content.some((c: any) => c?.type === 'tool_use');
+
+const isToolResultMessage = (m: ClaudeStreamMessage): boolean =>
+  m?.type === 'user' && Array.isArray(m.message?.content) &&
+  m.message.content.some((c: any) => c?.type === 'tool_result');
+
+const shortToolName = (name: string): string =>
+  name.startsWith('mcp__') ? name.split('__').slice(2).join('_') || name : name;
+
+function groupDisplayItems(messages: ClaudeStreamMessage[]): DisplayItem[] {
+  const items: DisplayItem[] = [];
+  let group: ClaudeStreamMessage[] = [];
+  let groupStart = 0;
+  const flush = () => {
+    if (group.length > 0) {
+      items.push({ kind: 'steps', items: group, startIndex: groupStart });
+      group = [];
+    }
+  };
+  messages.forEach((m, index) => {
+    if (hasToolUse(m)) {
+      if (group.length === 0) groupStart = index;
+      group.push(m);
+      return;
+    }
+    if (m.type === 'user' && isToolResultMessage(m) && group.length > 0) {
+      group.push(m);
+      return;
+    }
+    flush();
+    items.push({ kind: 'msg', msg: m, index });
+  });
+  flush();
+  return items;
+}
+
+// ToolRounds 折叠块：头部是步骤数与工具统计，展开后逐轮原样渲染。
+const ToolRounds: React.FC<{
+  items: ClaudeStreamMessage[];
+  onLinkDetected?: (url: string) => void;
+}> = ({ items, onLinkDetected }) => {
+  const [open, setOpen] = useState(false);
+  const toolCounts: Record<string, number> = {};
+  let steps = 0;
+  items.forEach((m) => {
+    (m?.message?.content || []).forEach((c: any) => {
+      if (c?.type === 'tool_use') {
+        steps += 1;
+        const n = shortToolName(c.name || '?');
+        toolCounts[n] = (toolCounts[n] || 0) + 1;
+      }
+    });
+  });
+  const summary = Object.entries(toolCounts)
+    .map(([n, c]) => `${n}×${c}`)
+    .join(' · ');
+
+  return (
+    <div className="border border-border/40 rounded-lg overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-muted-foreground hover:bg-muted/40 transition-colors"
+      >
+        {open ? '▾' : '▸'}
+        <span className="font-medium">执行过程 · {steps} 步</span>
+        <span className="truncate opacity-70">{summary}</span>
+      </button>
+      {open && (
+        <div className="px-2 py-1 space-y-1 border-t border-border/40 bg-background/40">
+          {items.map((m, i) => (
+            <StreamMessage
+              key={`step-${i}`}
+              message={m}
+              streamMessages={items}
+              onLinkDetected={onLinkDetected}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface MessageListProps {
   messages: ClaudeStreamMessage[];
@@ -25,9 +119,12 @@ export const MessageList: React.FC<MessageListProps> = React.memo(({
   const shouldAutoScrollRef = useRef(true);
   const userHasScrolledRef = useRef(false);
 
+  // 折叠工具轮次后的显示项（原始 messages 不变，仅渲染层分组）
+  const displayItems = useMemo(() => groupDisplayItems(messages), [messages]);
+
   // Virtual scrolling setup
   const virtualizer = useVirtualizer({
-    count: messages.length,
+    count: displayItems.length,
     getScrollElement: () => scrollContainerRef.current,
     estimateSize: () => 100, // Estimated height of each message
     overscan: 5,
@@ -105,9 +202,9 @@ export const MessageList: React.FC<MessageListProps> = React.memo(({
       >
         <AnimatePresence mode="popLayout">
           {virtualizer.getVirtualItems().map((virtualItem) => {
-            const message = messages[virtualItem.index];
-            const key = `msg-${virtualItem.index}-${message.type}`;
-            
+            const item = displayItems[virtualItem.index];
+            const key = `item-${virtualItem.index}-${item.kind}`;
+
             return (
               <motion.div
                 key={key}
@@ -124,11 +221,18 @@ export const MessageList: React.FC<MessageListProps> = React.memo(({
                 }}
               >
                 <div className="px-4 py-2">
-                  <StreamMessage 
-                    message={message}
-                    streamMessages={messages}
-                    onLinkDetected={onLinkDetected}
-                  />
+                  {item.kind === 'msg' ? (
+                    <StreamMessage
+                      message={item.msg}
+                      streamMessages={messages}
+                      onLinkDetected={onLinkDetected}
+                    />
+                  ) : (
+                    <ToolRounds
+                      items={item.items}
+                      onLinkDetected={onLinkDetected}
+                    />
+                  )}
                 </div>
               </motion.div>
             );
