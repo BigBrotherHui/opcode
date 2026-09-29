@@ -638,7 +638,27 @@ const StreamMessageComponent: React.FC<StreamMessageProps> = ({ message, classNa
     // Result message - render with markdown
     if (message.type === "result") {
       const isError = message.is_error || message.subtype?.includes("error");
-      
+
+      // result 事件的正文通常与上一条 assistant 消息完全相同（CLI 的 result 会带
+      // 最终文本），此时不再重复渲染正文，只保留完成摘要卡（状态/费用/时长/tokens）。
+      const idx = streamMessages ? streamMessages.indexOf(message) : -1;
+      let prevAssistantText = "";
+      if (idx > 0) {
+        for (let i = idx - 1; i >= 0; i--) {
+          const m = streamMessages[i];
+          if (m?.type === "assistant" && Array.isArray(m.message?.content)) {
+            prevAssistantText = m.message.content
+              .filter((c: any) => c?.type === "text")
+              .map((c: any) => c.text || "")
+              .join("\n")
+              .trim();
+            break;
+          }
+        }
+      }
+      const duplicatesAssistant =
+        !!message.result && message.result.trim() === prevAssistantText;
+
       return (
         <Card className={cn(
           isError ? "border-destructive/20 bg-destructive/5" : "border-green-500/20 bg-green-500/5",
@@ -656,7 +676,7 @@ const StreamMessageComponent: React.FC<StreamMessageProps> = ({ message, classNa
                   {isError ? "Execution Failed" : "Execution Complete"}
                 </h4>
                 
-                {message.result && (
+                {message.result && !duplicatesAssistant && (
                   <div className="prose prose-sm dark:prose-invert max-w-none">
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
