@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Send,
@@ -22,7 +22,7 @@ import { TooltipProvider, TooltipSimple, Tooltip, TooltipTrigger, TooltipContent
 import { FilePicker } from "./FilePicker";
 import { SlashCommandPicker } from "./SlashCommandPicker";
 import { ImagePreview } from "./ImagePreview";
-import { type FileEntry, type SlashCommand } from "@/lib/api";
+import { api, type FileEntry, type SlashCommand } from "@/lib/api";
 
 // Conditional import for Tauri webview window
 import { getCurrentWebviewWindow as tauriGetCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
@@ -180,19 +180,19 @@ type Model = {
   color: string;
 };
 
-const MODELS: Model[] = [
+const buildModels = (opusReal?: string, sonnetReal?: string): Model[] => [
   {
     id: "sonnet",
-    name: "Claude 4 Sonnet",
-    description: "更快，适合大多数任务的高效选择",
+    name: "Claude Sonnet",
+    description: sonnetReal ? `实际模型 ${sonnetReal} · 更快，适合大多数任务的高效选择` : "更快，适合大多数任务的高效选择",
     icon: <Zap className="h-3.5 w-3.5" />,
     shortName: "S",
     color: "text-primary"
   },
   {
     id: "opus",
-    name: "Claude 4 Opus",
-    description: "能力更强，更适合复杂任务",
+    name: "Claude Opus",
+    description: opusReal ? `实际模型 ${opusReal} · 能力更强，更适合复杂任务` : "能力更强，更适合复杂任务",
     icon: <Zap className="h-3.5 w-3.5" />,
     shortName: "O",
     color: "text-primary"
@@ -842,6 +842,22 @@ const FloatingPromptInputInner = (
 
     setPrompt(newPrompt.trim());
   };
+
+  // 动态显示 cc-switch 当前映射的真实模型 ID（读 ~/.claude/settings.json 的 env）
+  const [realModels, setRealModels] = useState<{ opus?: string; sonnet?: string }>({});
+  useEffect(() => {
+    api.getClaudeSettings().then((s: any) => {
+      const env = s?.env || {};
+      setRealModels({
+        opus: env.ANTHROPIC_DEFAULT_OPUS_MODEL || env.ANTHROPIC_MODEL || "",
+        sonnet: env.ANTHROPIC_DEFAULT_SONNET_MODEL || env.ANTHROPIC_MODEL || ""
+      });
+    }).catch(() => {});
+  }, []);
+  const MODELS = useMemo(
+    () => buildModels(realModels.opus, realModels.sonnet),
+    [realModels.opus, realModels.sonnet]
+  );
 
   const selectedModelData = MODELS.find(m => m.id === selectedModel) || MODELS[0];
 
