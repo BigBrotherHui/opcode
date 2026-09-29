@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { StreamMessage } from '../StreamMessage';
@@ -146,10 +146,29 @@ export const MessageList: React.FC<MessageListProps> = React.memo(({
         >
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <div className="h-2 w-2 bg-primary rounded-full animate-pulse" />
-            <span>Claude 正在思考…</span>
+            <ElapsedCounter />
           </div>
         </motion.div>
       )}
     </div>
   );
 });
+
+// ElapsedCounter 流式等待计时：让"模型在思考"与"请求卡住"可区分——
+// 超过 90 秒无任何流事件时提示可能卡住（后端看门狗默认 300 秒自动终止）。
+const ElapsedCounter: React.FC = () => {
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => setElapsed((e) => e + 1), 1000);
+    return () => clearInterval(timer);
+  }, []);
+  const mm = Math.floor(elapsed / 60);
+  const ss = elapsed % 60;
+  const stuck = elapsed >= 90;
+  return (
+    <span className={stuck ? 'text-yellow-500' : undefined}>
+      Claude 正在思考…（已等待 {mm > 0 ? `${mm} 分 ` : ''}{ss} 秒
+      {stuck ? '，无输出疑似卡住，超时将自动终止' : ''}）
+    </span>
+  );
+};
