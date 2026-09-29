@@ -106,6 +106,67 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
   const [rawJsonlOutput, setRawJsonlOutput] = useState<string[]>([]);
   const [copyPopoverOpen, setCopyPopoverOpen] = useState(false);
   const [isFirstPrompt, setIsFirstPrompt] = useState(!session);
+  const lastModelRef = useRef<"sonnet" | "opus" | null>(null);
+
+  // ── 编辑历史消息并从此继续 ──
+  // 计算每条可编辑提示的全局序号（在全部 messages 中按出现次序计，含被过滤的），
+  // 与后端 fork_session_at_message 的截断口径（按 user 行出现次序）一一对应。
+  const promptOrdinalByIndex = useMemo(() => {
+    const map = new Map<number, number>();
+    let ordinal = 0;
+    messages.forEach((m, index) => {
+      if (
+        m.type === "user" &&
+        !m.isMeta &&
+        typeof m.message?.content === "string"
+      ) {
+        map.set(index, ordinal);
+        ordinal += 1;
+      }
+    });
+    return map;
+  }, [messages]);
+
+  const handleEditPrompt = async (promptOccurrence: number, promptText: string) => {
+    if (!effectiveSession) {
+      setError("只有已保存的会话才能编辑历史消息");
+      return;
+    }
+    const projectId = effectiveSession.project_id;
+    const newSessionId = `edit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    try {
+      setIsLoading(true);
+      setError(null);
+      await api.forkSessionAtMessage(
+        effectiveSession.id,
+        projectId,
+        promptText,
+        promptOccurrence,
+        newSessionId
+      );
+      // 清空现场，把"当前会话"切到分叉出的新会话：编辑后的文本走 resume 路径
+      // 继续（转录已截到该消息之前），等于"改完这句话重新发"。
+      unlistenRefs.current.forEach((u) => u());
+      unlistenRefs.current = [];
+      isListeningRef.current = false;
+      hasActiveSessionRef.current = false;
+      setMessages([]);
+      setRawJsonlOutput([]);
+      setClaudeSessionId(newSessionId);
+      setExtractedSessionInfo({ sessionId: newSessionId, projectId });
+      setIsFirstPrompt(false);
+      try {
+        SessionPersistenceService.saveSession(newSessionId, projectId, projectPath, 0);
+      } catch { /* 持久化失败不阻断主流程 */ }
+      await api.resumeClaudeCode(projectPath, newSessionId, promptText, lastModelRef.current || "opus");
+    } catch (err) {
+      console.error("Failed to fork at message:", err);
+      setError(err instanceof Error ? err.message : String(err));
+      setIsLoading(false);
+      hasActiveSessionRef.current = false;
+    }
+  };
+
   const [totalTokens, setTotalTokens] = useState(0);
   const [extractedSessionInfo, setExtractedSessionInfo] = useState<{ sessionId: string; projectId: string } | null>(null);
   const [claudeSessionId, setClaudeSessionId] = useState<string | null>(null);
@@ -482,6 +543,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
 
   const handleSendPrompt = async (prompt: string, model: "sonnet" | "opus") => {
     console.log('[ClaudeCodeSession] handleSendPrompt called with:', { prompt, model, projectPath, claudeSessionId, effectiveSession });
+    lastModelRef.current = model;
     
     if (!projectPath) {
       setError("请先选择一个项目目录");
@@ -1243,10 +1305,12 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
                   top: virtualItem.start,
                 }}
               >
-                <StreamMessage 
-                  message={message} 
+                <StreamMessage
+                  message={message}
                   streamMessages={messages}
                   onLinkDetected={handleLinkDetected}
+                  promptOrdinal={promptOrdinalByIndex.get(messages.indexOf(message))}
+                  onEditPrompt={handleEditPrompt}
                 />
               </motion.div>
             );

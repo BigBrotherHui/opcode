@@ -1724,6 +1724,93 @@ pub async fn list_checkpoints(
     Ok(manager.list_checkpoints().await)
 }
 
+/// 在目标用户消息处截断会话并分叉新会话（"编辑历史消息并从此继续"的后端）。
+/// 与 fork_from_checkpoint 的区别：只复制并截断转录文件，不恢复代码快照、
+/// 不动检查点系统——编辑对话不应悄悄回滚工作区代码。
+///
+/// 截断边界：按"第 user_prompt_occurrence 次出现的人类提示"定位（content 为
+/// 字符串的 user 行；工具结果行的 content 是数组，不计入）。目标行及其后全部
+/// 丢弃。文本前 24 字符需与转录中该行前缀匹配，匹配失败直接报错（宁拒不截）。
+#[tauri::command]
+pub async fn fork_session_at_message(
+    session_id: String,
+    project_id: String,
+    user_prompt_text: String,
+    user_prompt_occurrence: usize,
+    new_session_id: String,
+) -> Result<String, String> {
+    let claude_dir = get_claude_dir().map_err(|e| e.to_string())?;
+    let src = claude_dir
+        .join("projects")
+        .join(&project_id)
+        .join(format!("{}.jsonl", session_id));
+    if !src.exists() {
+        return Err(format!("找不到会话转录文件: {}", src.display()));
+    }
+    let dst = claude_dir
+        .join("projects")
+        .join(&project_id)
+        .join(format!("{}.jsonl", new_session_id));
+    if dst.exists() {
+        return Err(format!("目标分叉会话已存在: {}", dst.display()));
+    }
+
+    let raw = std::fs::read_to_string(&src).map_err(|e| format!("读取会话转录失败: {}", e))?;
+
+    let needle: String = user_prompt_text.trim().chars().take(24).collect();
+    let mut kept: Vec<&str> = Vec::new();
+    let mut occurrence = 0usize;
+    let mut cut = false;
+    for line in raw.lines() {
+        let mut is_target = false;
+        if let Ok(v) = serde_json::from_str::<serde_json::Value>(line) {
+            if v.get("type").and_then(|t| t.as_str()) == Some("user")
+                && v.get("message")
+                    .and_then(|m| m.get("content"))
+                    .map(|c| c.is_string())
+                    .unwrap_or(false)
+            {
+                if occurrence == user_prompt_occurrence {
+                    let line_text = v
+                        .get("message")
+                        .and_then(|m| m.get("content"))
+                        .and_then(|c| c.as_str())
+                        .unwrap_or("")
+                        .trim();
+                    if !needle.is_empty() && !line_text.starts_with(&needle) {
+                        return Err(
+                            "未在会话转录中匹配到目标消息（文本不一致），已取消分叉".into(),
+                        );
+                    }
+                    is_target = true;
+                }
+                occurrence += 1;
+            }
+        }
+        if is_target {
+            cut = true;
+            break;
+        }
+        kept.push(line);
+    }
+
+    if !cut {
+        return Err("未在会话转录中找到目标消息（出现序号越界），已取消分叉".into());
+    }
+
+    std::fs::write(&dst, format!("{}\n", kept.join("\n")))
+        .map_err(|e| format!("写入分叉会话失败: {}", e))?;
+
+    log::info!(
+        "Forked session {} -> {} at user prompt #{} ({} lines kept)",
+        session_id,
+        new_session_id,
+        user_prompt_occurrence,
+        kept.len()
+    );
+    Ok(new_session_id)
+}
+
 /// Forks a new timeline branch from a checkpoint
 #[tauri::command]
 pub async fn fork_from_checkpoint(

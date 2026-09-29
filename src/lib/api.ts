@@ -547,6 +547,22 @@ export const api = {
    * Reads the Claude settings file
    * @returns Promise resolving to the settings object
    */
+  async forkSessionAtMessage(
+    sessionId: string,
+    projectId: string,
+    promptText: string,
+    promptOccurrence: number,
+    newSessionId: string
+  ): Promise<string> {
+    return apiCall<string>("fork_session_at_message", {
+      sessionId,
+      projectId,
+      promptText,
+      promptOccurrence,
+      newSessionId,
+    });
+  },
+
   async getClaudeSettings(): Promise<ClaudeSettings> {
     try {
       const result = await apiCall<{ data: ClaudeSettings }>("get_claude_settings");

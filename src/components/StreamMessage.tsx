@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Terminal, 
-  User, 
-  Bot, 
-  AlertCircle, 
-  CheckCircle2
+import {
+  Terminal,
+  User,
+  Bot,
+  AlertCircle,
+  CheckCircle2,
+  Pencil
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -41,17 +42,85 @@ import {
   WebFetchWidget
 } from "./ToolWidgets";
 
+// PromptEditWidget 历史提示的行内编辑面板：铅笔展开 → 文本域 → 提交即
+// "编辑并从此继续"（父组件负责分叉新会话并以编辑后文本继续对话）。
+const PromptEditWidget: React.FC<{
+  promptText: string;
+  promptOrdinal: number;
+  onEditPrompt: (promptOccurrence: number, promptText: string) => void;
+}> = ({ promptText, promptOrdinal, onEditPrompt }) => {
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => { setDraft(promptText); setOpen(true); }}
+        className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        title="编辑这条消息并从此处继续对话（创建分叉会话，不影响本会话与代码文件）"
+      >
+        <Pencil className="h-3 w-3" />
+        编辑并从此继续
+      </button>
+    );
+  }
+
+  return (
+    <div className="mt-2 space-y-2 border border-border/40 rounded-md p-2 bg-background/60">
+      <textarea
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        disabled={submitting}
+        rows={Math.min(10, Math.max(3, draft.split("\n").length))}
+        className="w-full text-sm bg-transparent border border-border/40 rounded p-2 focus:outline-none focus:ring-1 focus:ring-primary/40 resize-y"
+        autoFocus
+      />
+      <div className="flex items-center gap-2 text-xs">
+        <button
+          onClick={async () => {
+            const next = draft.trim();
+            if (!next || next === promptText.trim() || submitting) return;
+            setSubmitting(true);
+            try {
+              await onEditPrompt(promptOrdinal, next);
+            } finally {
+              setSubmitting(false);
+            }
+          }}
+          disabled={submitting || !draft.trim() || draft.trim() === promptText.trim()}
+          className="px-2.5 py-1 rounded bg-primary text-primary-foreground disabled:opacity-40"
+        >
+          {submitting ? "分叉中…" : "编辑并从此继续"}
+        </button>
+        <button
+          onClick={() => setOpen(false)}
+          disabled={submitting}
+          className="px-2.5 py-1 rounded border border-border/40 text-muted-foreground hover:bg-muted/40"
+        >
+          取消
+        </button>
+        <span className="text-muted-foreground/70">将创建分叉会话，不影响本会话与代码文件</span>
+      </div>
+    </div>
+  );
+};
+
 interface StreamMessageProps {
   message: ClaudeStreamMessage;
   className?: string;
   streamMessages: ClaudeStreamMessage[];
   onLinkDetected?: (url: string) => void;
+  /** 该消息在会话中是第几次人类提示（0 基），仅 user 消息有效；配合 onEditPrompt 提供编辑入口 */
+  promptOrdinal?: number;
+  /** "编辑此消息并从此继续"回调：传入 (第几次提示, 原文) */
+  onEditPrompt?: (promptOccurrence: number, promptText: string) => void;
 }
 
 /**
  * Component to render a single Claude Code stream message
  */
-const StreamMessageComponent: React.FC<StreamMessageProps> = ({ message, className, streamMessages, onLinkDetected }) => {
+const StreamMessageComponent: React.FC<StreamMessageProps> = ({ message, className, streamMessages, onLinkDetected, promptOrdinal, onEditPrompt }) => {
   // State to track tool results mapped by tool call ID
   const [toolResults, setToolResults] = useState<Map<string, any>>(new Map());
   
@@ -362,6 +431,14 @@ const StreamMessageComponent: React.FC<StreamMessageProps> = ({ message, classNa
                     return (
                       <div className="text-sm">
                         {contentStr}
+                        {/* 编辑此消息并从此继续：仅对可编辑提示提供（父组件给出序号与回调时） */}
+                        {onEditPrompt && typeof promptOrdinal === 'number' && (
+                          <PromptEditWidget
+                            promptText={contentStr}
+                            promptOrdinal={promptOrdinal}
+                            onEditPrompt={onEditPrompt}
+                          />
+                        )}
                       </div>
                     );
                   })()
